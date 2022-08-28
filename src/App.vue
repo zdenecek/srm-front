@@ -1,8 +1,11 @@
 <template>
     <div class="container">
+        <div class="nav">
+            <router-link active-class="active" class="nav-item" to="/">Inzeráty</router-link>
+            <router-link active-class="active" class="nav-item" to="/about">Informace</router-link>
+        </div>
         <router-view></router-view>
     </div>
- 
 </template>
 
 <script lang="ts">
@@ -10,24 +13,44 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
     name: "App",
-
 });
 </script>
 
-<style>
+<style lang="scss">
+.nav {
+    display: flex;
+}
+
+.nav-item {
+    flex-grow: 1;
+    text-align: center;
+    outline: brown solid 1px;
+    text-decoration: none;
+    color: brown;
+
+    &.active {
+        background-color: lightgray;
+    }
+}
 
 * {
     box-sizing: border-box;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana,
+        sans-serif;
 }
 
 .container {
     max-width: 900px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     padding-bottom: 100px;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     padding: 0;
     margin: 0;
     color: brown;
@@ -55,8 +78,8 @@ input:focus {
     background-color: #d8d8d8;
 }
 .active-page {
-    background-color:  #ca742d;
-    border: 1px solid  #ca742d;
+    background-color: #ca742d;
+    border: 1px solid #ca742d;
     color: white;
 }
 .active-page:hover {

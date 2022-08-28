@@ -37,7 +37,7 @@ export default defineComponent({
     data() {
         return {
             listings: [],
-            listingsCount: 1,
+            listingsCount: 0,
             perPage: 20,
             page: 1,
             query: "",
