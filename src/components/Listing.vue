@@ -2,8 +2,8 @@
     <div class="listing">
         <div class="heading">{{ data?.title ?? "Inzerát" }}</div>
         <div class="images">
-            <div v-for="image in data?.images" :key="image">
-                <img loading="lazy" :src="image" />
+            <div v-for="image in data?.images" :key="image.gallery">
+                <img loading="lazy" :src="image.gallery" @click="openImage(image.view)" />
             </div>
         </div>
         <div class="overview">
@@ -72,6 +72,9 @@ export default defineComponent({
         toggleDetails() {
             this.showDetails = !this.showDetails;
         },
+        openImage(url: string) {
+            console.log('not supported');
+        }
     },
 });
 </script>
