@@ -1,19 +1,16 @@
 <template>
     <div class="container">
-        <listings-view></listings-view>
+        <router-view></router-view>
     </div>
  
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import ListingsView from "@/components/ListingsView.vue";
 
 export default defineComponent({
     name: "App",
-    components: {
-        ListingsView,
-    },
+
 });
 </script>
 
@@ -30,11 +27,15 @@ export default defineComponent({
     padding-bottom: 100px;
 }
 
-h1, h2 {
+h1, h2, h3 {
+    padding: 0;
+    margin: 0;
     color: brown;
 }
 
-
+input:focus {
+    outline: 2px solid orange;
+}
 
 .pagination-container {
     display: flex;

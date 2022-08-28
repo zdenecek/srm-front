@@ -22,9 +22,17 @@
             <a class="button" :href="data?.apiUrl" target="_blank">Api</a>
         </div>
         <div class="details" v-show="showDetails">
-            <div class="label" v-for="(item, key) in data?.items" :key="key">
-                <span>{{ key }}</span>
-                <span>{{ item }}</span>
+            <div class="items">
+                <div class="label" v-for="(item, key) in data?.items" :key="key">
+                    <span>{{ key }}</span>
+                    <span>{{ item }}</span>
+                </div>
+            </div>
+            <div class="meta">
+                <div  v-if="priceHistory">
+                <h3>Vývoj cen</h3>
+                <price-chart class="chart" :data="priceHistory"></price-chart>
+                </div>
             </div>
         </div>
     </div>
@@ -32,9 +40,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import PriceChart from "./PriceChart.vue";
 
 export default defineComponent({
     name: "Listing",
+    components: {
+        PriceChart,
+    },
     props: {
         data: Object,
     },
@@ -45,11 +57,15 @@ export default defineComponent({
     },
     computed: {
         price() {
-            let s = (this.data?.price + " Kč") ?? "-";
-            if(this.data?.priceUnit) s += " " + this.data?.priceUnit;
-            if(this.data?.pricePerMeter) s +=  `(${this.data?.pricePerMeter} Kč/m²)`;
-            
+            let s = this.data?.price + " Kč" ?? "-";
+            if (this.data?.priceUnit) s += " " + this.data?.priceUnit;
+            if (this.data?.pricePerMeter) s += ` (${this.data?.pricePerMeter} Kč/m²)`;
+
             return s;
+        },
+        priceHistory() {
+            if(!this.data?.priceHistory || Object.keys(this.data?.priceHistory).length < 2) return false;
+            return this.data.priceHistory;
         },
     },
     methods: {
@@ -61,9 +77,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-
 .button {
-
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -74,11 +88,10 @@ export default defineComponent({
     color: white;
     font-weight: bold;
     cursor: pointer;
-    
+
     &:hover {
         background: brown;
     }
-    
 }
 
 .listing {
@@ -87,7 +100,6 @@ export default defineComponent({
     outline: solid brown 1px;
     border-radius: 10px;
     overflow: hidden;
-
 
     & > div {
         padding: 10px 20px;
@@ -129,12 +141,22 @@ export default defineComponent({
 }
 
 .details {
-    display: flex;
-    flex-flow: column;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 
-    .label {
-        grid-template-columns: 200px auto;
+    .items {
+        display: flex;
+        flex-flow: column;
+        gap: 6px;
+
+        .label {
+            background-color: #f2f2f2;
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .meta {
+        padding: 10px;
     }
 }
 
