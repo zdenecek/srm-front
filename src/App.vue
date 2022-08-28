@@ -39,6 +39,10 @@ export default defineComponent({
         sans-serif;
 }
 
+body {
+    font-size: 0.8em;
+}
+
 .container {
     max-width: 900px;
     margin: 0 auto;

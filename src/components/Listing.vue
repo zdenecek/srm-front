@@ -2,8 +2,8 @@
     <div class="listing">
         <div class="heading">{{ data?.title ?? "Inzerát" }}</div>
         <div class="images">
-            <div v-for="image in data?.images" :key="image.gallery">
-                <img loading="lazy" :src="image.gallery" @click="openImage(image.view)" />
+            <div v-for="image in data?.images" :key="image.view">
+                <img loading="lazy" :src="image.view" @click="openImage(image.self)" />
             </div>
         </div>
         <div class="overview">
