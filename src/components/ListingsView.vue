@@ -1,25 +1,27 @@
 <template>
-    <div class="listings">
-        <div class="controls">
-            <h1>Filtr a vyhledávání</h1>
-            <form @submit.prevent="getListings">
-                <input class="search" placeholder="Vyhledávání..." v-model="query" />
-            </form>
-        </div>
-
+    <div>
+        <listings-filter @update="update"></listings-filter>
         <div class="listings">
-            <h1>{{ listingsCount }} inzerátů</h1>
-            <span v-show="loading">Inzeráty se načítají...</span>
-            <listing v-for="listing in listings" :data="listing" :key="listing['_id']"></listing>
+            <div class="listings">
+                <h1>{{ listingsCount }} inzerátů</h1>
+
+                <pagination
+                            v-show="listingsCount > perPage"
+                            v-model="page"
+                            :records="listingsCount"
+                            :per-page="perPage"
+                            @paginate="updatePage" />
+
+                <span v-show="loading">Inzeráty se načítají...</span>
+                <listing v-for="listing in listings" :data="listing" :key="listing['_id']"></listing>
+            </div>
+            <pagination
+                        v-show="listingsCount > perPage"
+                        v-model="page"
+                        :records="listingsCount"
+                        :per-page="perPage"
+                        @paginate="updatePage" />
         </div>
-        <vue-awesome-paginate
-            v-show="listingsCount > perPage"
-            :total-items="listingsCount"
-            :items-per-page="perPage"
-            :max-pages-shown="5"
-            :current-page="1"
-            :on-click="updatePage"
-        />
     </div>
 </template>
 
@@ -28,44 +30,58 @@ import { defineComponent } from "vue";
 import Listing from "@/components/Listing.vue";
 import axios from "axios";
 import _ from "lodash";
+import ListingsFilter from "./ListingsFilter.vue";
+import { FilterObject } from "@/class/FilterObject";
+import { MunicipalityObject } from "@/class/MunicipalityObject";
+// @ts-ignore
+import Pagination from "v-pagination-3";
 
 export default defineComponent({
     name: "ListingsView",
     components: {
         Listing,
+        ListingsFilter,
+        Pagination,
     },
     data() {
         return {
-            listings: [],
+            listings: [] as Array<any>,
             listingsCount: 0,
-            perPage: 20,
-            page: 1,
-            query: "",
-            lastQuery: "",
+            perPage: parseInt(this.$route.query.perPage as string) || 20,
+            page: parseInt(this.$route.query.p as string) || 1,
             loading: false,
+            filter: undefined as FilterObject | undefined,
+            municipalitiesFilter: [] as Array<MunicipalityObject>,
         };
     },
 
     created() {
-        this.getListingsDebouced = _.debounce(() => {
-            if (this.query === this.lastQuery) return;
-            this.lastQuery = this.query;
-            this.getListings();
-        }, 1000);
-        this.getListings();
+        const debounced = _.debounce(this.getListings, 1000);
+        this.getListingsDebouced = () => {
+            this.loading = true;
+            debounced();
+        };
+
+        if (this.$route.query.id) this.getListings(this.$route.query.id as string);
+        else this.getListings();
     },
 
     watch: {
         page() {
-            this.getListings();
-        },
-        query() {
-            this.getListingsDebouced();
-        },
+            this.$router.push({ query: { p: this.page } });
+        }
+
     },
 
     methods: {
-        getListings() {
+        update(filter?: FilterObject, municipalities?: Array<MunicipalityObject>) {
+            this.filter = filter;
+            this.page = 1;
+            this.municipalitiesFilter = municipalities || [];
+            this.getListingsDebouced();
+        },
+
+        getListings(id?: string) {
             console.debug("fetching listings");
             this.loading = true;
             let params = {
@@ -73,17 +89,27 @@ export default defineComponent({
                 perPage: this.perPage,
             } as any;
 
-            if (this.query) {
-                params.q = this.query;
+            if (this.filter) {
+                params = { ...params, ...this.filter.toParams() };
             }
 
+            if (this.municipalitiesFilter.length > 0) {
+                params.municipalities = this.municipalitiesFilter
+                    .filter((a) => a.selected)
+                    .map((a) => a._id ?? "0")
+                    .join(",");
+            }
+
+            if (id) params = { id };
+
             axios
-                .get("getAll", {
-                    params,
+                .post("getAll", {
+                    ...params,
                 })
                 .then((response) => {
                     this.listingsCount = response.data.count;
                     this.listings = response.data.listings;
+                    if (this.listingsCount === 1) this.listings[0].autoExpand = true;
                     this.loading = false;
                 })
                 .catch((error) => {
@@ -93,45 +119,49 @@ export default defineComponent({
         getListingsDebouced() {
             return;
         },
-        updatePage(page: number) {
-            window.scrollTo(0, 0);
+        updatePage() {
+            if (window.pageYOffset > 1200) window.scrollTo(0, 0);
 
-            this.page = page;
+            this.getListingsDebouced();
         },
     },
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
 .listings {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.search {
-    padding: 5px 4px;
-    max-width: 400px;
+.pagination {
+    list-style: none;
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    padding: 0;
+
+    button[disabled] {
+        opacity: 0.5;
+    }
+
+    button {
+        background-color: antiquewhite;
+        border: 1px brown solid;
+        color: brown;
+        border-radius: 5px;
+        padding: 2px 5px;
+
+        &.active,
+        &:not([disabled]):hover {
+            background-color: brown;
+            color: antiquewhite;
+        }
+    }
 }
 
-.controls {
-    display: flex;
-    gap: 10px;
-    flex-flow: column;
-
-    form {
-        padding: 10px 0;
-        display: grid;
-        grid-template-columns: 1 1;
-        gap: 10px;
-    }
-
-    .search {
-        border: 1px solid brown;
-        border-radius: 4px;
-        padding: 5px;
-        font-size: 1.2rem;
-    }
+.VuePagination__count {
+    display: none;
 }
 </style>

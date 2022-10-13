@@ -1,9 +1,9 @@
 <template>
     <div class="listing">
-        <div class="heading">{{ data?.title ?? "Inzerát" }}</div>
+        <div class="heading">{{ data?.title ?? "Inzerát" }}, {{ address }}</div>
         <div class="images">
             <div v-for="image in data?.images" :key="image.view">
-                <img loading="lazy" :src="image.view" @click="openImage(image.self)" />
+                <img loading="lazy" :src="image.gallery ?? image.view" @click="openImage(image.self)" />
             </div>
         </div>
         <div class="overview">
@@ -11,27 +11,40 @@
                 <span>Cena</span>
                 <span>{{ price }}</span>
             </div>
-            <div class="label description">
-                <span>Popis</span>
-                <span>{{ data?.description ?? "-" }}</span>
+            <div class="label" v-if="ownership">
+                <span>Vlastnictví</span>
+                <span>{{ ownership }}</span>
+            </div>
+            <div class="label" v-if="age">
+                <span>Stáří</span>
+                <span>{{ age }}</span>
             </div>
         </div>
+
         <div class="actions">
             <div class="button" @click="toggleDetails">Zobrazit detaily</div>
             <a class="button" :href="'https://' + data?.url" target="_blank">Otevřít na sreality</a>
             <a class="button" :href="data?.apiUrl" target="_blank">Api</a>
         </div>
         <div class="details" v-show="showDetails">
+            <div class="description">
+                <span v-html="data?.description ?? '-'"></span>
+            </div>
             <div class="items">
                 <div class="label" v-for="(item, key) in data?.items" :key="key">
                     <span>{{ key }}</span>
-                    <span>{{ item }}</span>
+                    <checkmark v-if="item === false || item === true" :value="item"></checkmark>
+                    <span v-else>{{ item }}</span>
+                </div>
+                <div class="label" v-if="priceDrop">
+                    <span>Sleva</span>
+                    <span>priceDrop</span>
                 </div>
             </div>
             <div class="meta">
-                <div  v-if="priceHistory">
-                <h3>Vývoj cen</h3>
-                <price-chart class="chart" :data="priceHistory"></price-chart>
+                <div>
+                    <h3>Vývoj cen</h3>
+                    <price-chart class="chart" :data="priceHistory"></price-chart>
                 </div>
             </div>
         </div>
@@ -39,33 +52,51 @@
 </template>
 
 <script lang="ts">
+import { Ownership } from "@/class/types";
 import { defineComponent } from "vue";
 import PriceChart from "./PriceChart.vue";
+import Checkmark from "./Checkmark.vue";
 
 export default defineComponent({
     name: "Listing",
     components: {
         PriceChart,
+        Checkmark,
     },
     props: {
         data: Object,
     },
     data() {
         return {
-            showDetails: false,
+            showDetails: this.data?.autoExpand ?? false,
         };
     },
     computed: {
         price() {
-            let s = this.data?.price + " Kč" ?? "-";
+            let s = this.data?.price?.toLocaleString() + " Kč" ?? "-";
             if (this.data?.priceUnit) s += " " + this.data?.priceUnit;
-            if (this.data?.pricePerMeter) s += ` (${this.data?.pricePerMeter} Kč/m²)`;
+            if (this.data?.pricePerMeter) s += ` (${Math.round(this.data?.pricePerMeter).toLocaleString()} Kč/m²)`;
 
-            return s;
+            return this.data?.price ? s : "-";
         },
         priceHistory() {
-            if(!this.data?.priceHistory || Object.keys(this.data?.priceHistory).length < 2) return false;
-            return this.data.priceHistory;
+            return this.data?.priceHistory;
+        },
+        age() {
+            if(this.data?.inserted) {
+                const age = Math.ceil((Date.now() - Date.parse(this.data?.inserted)) / (1000 * 60 * 60 * 24));
+                return age + (age === 1 ? " den" : " dní");
+            }
+            else return false;
+        },
+        ownership() {
+            return Ownership[this.data?.ownership] ?? false;
+        },
+        priceDrop() {
+            return this.data?.priceDropPercentage > 0 ? `${this.data?.priceDropPercentage} %` : false;
+        },
+        address() {
+            return this.data?.address ?? this.data?.locality?.name ?? "";
         },
     },
     methods: {
@@ -73,8 +104,8 @@ export default defineComponent({
             this.showDetails = !this.showDetails;
         },
         openImage(url: string) {
-            console.log('not supported');
-        }
+            console.warn("not supported");
+        },
     },
 });
 </script>
@@ -105,7 +136,7 @@ export default defineComponent({
     overflow: hidden;
 
     & > div {
-        padding: 10px 20px;
+        padding: 4px 20px;
     }
 }
 
@@ -122,10 +153,6 @@ export default defineComponent({
     overflow-x: auto;
 
     img {
-        max-height: 300px;
-    }
-
-    img:not(:hover) {
         max-height: 200px;
     }
 }
@@ -141,6 +168,11 @@ export default defineComponent({
     flex-flow: row;
     gap: 6px;
     outline: solid brown 1px;
+}
+
+.description {
+    grid-column: 1/3;
+    padding-bottom: 10px;
 }
 
 .details {

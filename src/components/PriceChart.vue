@@ -12,17 +12,22 @@ export default defineComponent({
         data: Object,
     },
     mounted() {
-       
-        const ctx = document.getElementById("myChart");
+
+        // add price for today to have at least two entries
+        const data = {...this.data};
+        const today = new Date(Date.now()).toISOString().split('T')[0];
+        const all = Object.values(data);
+        data[today] = all[all.length - 1];
+
         const myChart = new Chart(this.$refs.canvas as ChartItem, {
             type: "line",
             data: {
                 datasets: [
                     {
                         label: "Cena",
-                         fill: true,
+                        fill: true,
                         borderColor: 'brown',
-                        data: this.data,
+                        data: data,
                     },
                 ],
             },

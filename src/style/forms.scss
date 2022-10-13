@@ -1,0 +1,101 @@
+
+$gap: 10px;
+$inputWidth: 150px;
+
+
+.flex {
+    display: flex;
+    gap: $gap;
+    align-items: center;
+}
+
+.flex-col {
+    display: flex;
+    gap: $gap;
+    flex-direction: column;
+}
+
+.form-grid {
+    padding: 10px 0;
+    display: grid;
+    grid-template-columns: minmax(100px, auto) 1fr;
+    align-items: center;
+    gap: 10px;
+
+    .label {
+        text-align: right;
+        font-weight: bold;
+        align-self: baseline;
+        padding-top: .5em;
+        color: brown;
+    }
+
+    & > div {
+        min-height: 2.5em;
+    }
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+
+    & > div {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+    }
+}
+
+.checkbox-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+button {
+    border: brown solid 1px;
+    background-color: antiquewhite;
+    color: brown;
+    border-radius: 10px;
+
+    height: 2em;
+
+    &:hover {
+        background-color: brown;
+        color: antiquewhite;
+        transition: ease-out .5s;
+    }
+
+    &:active {
+        background-color: white;
+    }
+}
+
+input[type="text"],
+input[type="number"] {
+    border: 1px solid brown;
+    border-radius: 4px;
+    padding: 5px;
+    width: $inputWidth;
+
+    &.long {
+        width: 2 * $inputWidth + $gap;
+    }
+
+    &.short {
+        width: 50px;
+    }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input:invalid {
+    background-color: lightpink;
+}

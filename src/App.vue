@@ -17,6 +17,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+
 .nav {
     display: flex;
 }
