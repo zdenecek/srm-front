@@ -38,7 +38,7 @@
                 <circle cx="12" cy="16" r="1"></circle>
                 <path d="M8 11v-4a4 4 0 0 1 8 0v4"></path>
             </svg>
-            <span>(Při zamčení není výčet měst ovlivňován změnami filtru, veškeré změny se aplikují při odemknutí)</span>
+            <span>(Výčet měst nebude ovlivňovám dalšími změnami filtru)</span>
         </div>
         <div class="label">Počet inzerátů ve městě</div>
         <div class="checkbox-grid">

@@ -1,44 +1,46 @@
 <template>
     <div class="listing">
-        <div class="heading">{{ data?.title ?? "Inzerát" }}, {{ address }}</div>
+        <div class ="header">
+            <div class="labels"> </div>
+            <div class="heading">{{ data?.title ?? "Inzerát" }}, {{ address }}</div>
+        </div>
         <div class="images">
             <div v-for="image in data?.images" :key="image.view">
-                <img loading="lazy" :src="image.gallery ?? image.view" @click="openImage(image.self)" />
+                <img loading="lazy" :src="image.gallery ?? image.view" />
             </div>
         </div>
         <div class="overview">
-            <div class="label price">
+            <div class="listing-label price">
                 <span>Cena</span>
                 <span>{{ price }}</span>
             </div>
-            <div class="label" v-if="ownership">
+            <div class="listing-label" v-if="ownership">
                 <span>Vlastnictví</span>
                 <span>{{ ownership }}</span>
             </div>
-            <div class="label" v-if="age">
+            <div class="listing-label" v-if="age">
                 <span>Stáří</span>
                 <span>{{ age }}</span>
             </div>
         </div>
-
         <div class="actions">
             <div class="button" @click="toggleDetails">Zobrazit detaily</div>
-            <a class="button" :href="'https://' + data?.url" target="_blank">Otevřít na sreality</a>
+            <a class="button" :href="webUrl" target="_blank">Otevřít na sreality</a>
             <a class="button" :href="data?.apiUrl" target="_blank">Api</a>
         </div>
         <div class="details" v-show="showDetails">
             <div class="description">
-                <span v-html="data?.description ?? '-'"></span>
+                <span v-html="description"></span>
             </div>
             <div class="items">
-                <div class="label" v-for="(item, key) in data?.items" :key="key">
+                <div class="listing-label" v-for="(item, key) in data?.items" :key="key">
                     <span>{{ key }}</span>
                     <checkmark v-if="item === false || item === true" :value="item"></checkmark>
                     <span v-else>{{ item }}</span>
                 </div>
-                <div class="label" v-if="priceDrop">
+                <div class="listing-label" v-if="priceDrop">
                     <span>Sleva</span>
-                    <span>priceDrop</span>
+                    <span>{{priceDrop}}</span>
                 </div>
             </div>
             <div class="meta">
@@ -53,9 +55,10 @@
 
 <script lang="ts">
 import { Ownership } from "@/class/types";
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import PriceChart from "./PriceChart.vue";
 import Checkmark from "./Checkmark.vue";
+import {PropertyLabels, PropertyCodes} from "@/class/types";
 
 export default defineComponent({
     name: "Listing",
@@ -65,13 +68,24 @@ export default defineComponent({
     },
     props: {
         data: Object,
+        autoexpand:  Boolean  as PropType<boolean>,
+    },
+    created() {
+        if(this.autoexpand) this.showDetails = true;
     },
     data() {
         return {
-            showDetails: this.data?.autoExpand ?? false,
+            showDetails: false,
+            PropertyLabels, PropertyCodes
         };
     },
     computed: {
+        webUrl() {
+            return 'https://' + this.data?.url;
+        },
+        description() {
+            return this.data?.description ?? '-';
+        },
         price() {
             let s = this.data?.price?.toLocaleString() + " Kč" ?? "-";
             if (this.data?.priceUnit) s += " " + this.data?.priceUnit;
@@ -83,7 +97,7 @@ export default defineComponent({
             return this.data?.priceHistory;
         },
         age() {
-            if(this.data?.inserted) {
+            if (this.data?.inserted) {
                 const age = Math.ceil((Date.now() - Date.parse(this.data?.inserted)) / (1000 * 60 * 60 * 24));
                 return age + (age === 1 ? " den" : " dní");
             }
@@ -93,7 +107,7 @@ export default defineComponent({
             return Ownership[this.data?.ownership] ?? false;
         },
         priceDrop() {
-            return this.data?.priceDropPercentage > 0 ? `${this.data?.priceDropPercentage} %` : false;
+            return this.data?.priceDropPercent > 0 ? `${this.data?.priceDropPercent} %` : false;
         },
         address() {
             return this.data?.address ?? this.data?.locality?.name ?? "";
@@ -101,16 +115,16 @@ export default defineComponent({
     },
     methods: {
         toggleDetails() {
-            this.showDetails = !this.showDetails;
-        },
-        openImage(url: string) {
-            console.warn("not supported");
-        },
-    },
+            this.showDetails = ! this.showDetails;
+        }
+    }
 });
 </script>
 
 <style lang="scss">
+@import "../style/labels.scss";
+
+
 .button {
     text-decoration: none;
     display: flex;
@@ -135,16 +149,20 @@ export default defineComponent({
     border-radius: 10px;
     overflow: hidden;
 
-    & > div {
+    &>div {
         padding: 4px 20px;
     }
 }
 
-.heading {
-    color: brown;
-    font-size: 2em;
+.header {
     outline: solid brown 1px;
     background-color: #f2f2f2;
+}
+
+.heading {
+    color: brown;
+    font-size: 1.5em;
+   
 }
 
 .images {
@@ -176,15 +194,20 @@ export default defineComponent({
 }
 
 .details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
+
+    @media only screen and (min-width: 768px) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
 
     .items {
         display: flex;
         flex-flow: column;
         gap: 6px;
 
-        .label {
+        .listing-label {
             background-color: #f2f2f2;
             grid-template-columns: 1fr 1fr;
         }
@@ -195,7 +218,7 @@ export default defineComponent({
     }
 }
 
-.label {
+.listing-label {
     display: grid;
     grid-template-columns: 100px auto;
     gap: 10px;

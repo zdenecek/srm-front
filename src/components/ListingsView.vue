@@ -10,7 +10,8 @@
                             v-model="page"
                             :records="listingsCount"
                             :per-page="perPage"
-                            @paginate="updatePage" />
+                            @paginate="updatePage"
+                            :autoexpand="expand" />
 
                 <span v-show="loading">Inzeráty se načítají...</span>
                 <listing v-for="listing in listings" :data="listing" :key="listing['_id']"></listing>
@@ -66,11 +67,18 @@ export default defineComponent({
         else this.getListings();
     },
 
+    computed: {
+        expand() {
+            // volar nonsense
+            if(this.listingsCount === 1) return true;
+            return false;
+        }
+    },
+
     watch: {
         page() {
             this.$router.push({ query: { p: this.page } });
         }
-
     },
 
     methods: {
@@ -109,7 +117,6 @@ export default defineComponent({
                 .then((response) => {
                     this.listingsCount = response.data.count;
                     this.listings = response.data.listings;
-                    if (this.listingsCount === 1) this.listings[0].autoExpand = true;
                     this.loading = false;
                 })
                 .catch((error) => {

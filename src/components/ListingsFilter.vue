@@ -25,36 +25,53 @@
                                    v-show="searchType == 'str'" />
                             <geo-filter v-model="filterObject.location" v-show="searchType == 'loc'"></geo-filter>
                         </div>
-                        <div class="label">Cena</div>
+                        <div class="label">Cena prodeje</div>
                         <div class="price-filter flex">
-                            <input type="number" placeholder="Od Kč" v-model="filterObject.priceMin" />
-                            <input type="number" placeholder="Do Kč" v-model="filterObject.priceMax" />
+                            <input type="number" placeholder="Od Kč" v-model="filterObject.priceMin" min="0" />
+                            <input type="number" placeholder="Do Kč" v-model="filterObject.priceMax" min="0" />
                         </div>
-                        <div class="label">Sleva od prvotní ceny</div>
-                        <div class="flex">
-                            <input type="number" v-model="filterObject.priceDropPercent" placeholder="Alespoň %" />
-                            <input type="number" v-model="filterObject.priceDropCZK" placeholder="Alespoň Kč" />
+                        <div class="label">Nájem</div>
+                        <div class="price-filter flex">
+                            <input type="number" placeholder="Od Kč/měsíc" v-model="filterObject.rentMin" min="0" />
+                            <input type="number" placeholder="Do Kč/měsíc" v-model="filterObject.rentMax" min="0" />
                         </div>
-                        <div class="label">Cena za užitnou plochu</div>
+                        <div class="label">Sleva ceny/nájmu</div>
                         <div class="flex">
-                            <input type="number" placeholder="Od Kč/m²" v-model="filterObject.pricePerMeterMin" />
-                            <input type="number" placeholder="Do Kč/m²" v-model="filterObject.pricePerMeterMax" />
+                            <input type="number" v-model="filterObject.priceDropPercent" placeholder="Alespoň %" min="0"
+                                   max="100"
+                                   step="0.05" />
+                            <input type="number" v-model="filterObject.priceDropCZK" placeholder="Alespoň Kč" min="0"
+                                   step="0.05" />
+                        </div>
+                        <div class="label">Cena za plochu</div>
+                        <div class="flex">
+                            <input type="number" placeholder="Od Kč/m²" v-model="filterObject.pricePerMeterMin"
+                                   min="0" />
+                            <input type="number" placeholder="Do Kč/m²" v-model="filterObject.pricePerMeterMax"
+                                   min="0" />
+                        </div>
+                        <div class="label">Nájem za plochu</div>
+                        <div class="flex">
+                            <input type="number" placeholder="Od Kč/m² a měsíc" v-model="filterObject.rentPerMeterMin"
+                                   min="0" />
+                            <input type="number" placeholder="Do Kč/m² a měsíc" v-model="filterObject.rentPerMeterMax"
+                                   min="0" />
                         </div>
                         <div class="label">Stáří inzerátu</div>
                         <div class="flex">
-                            <input type="number" v-model="filterObject.ageMin" placeholder="Alespoň dní" />
-                            <input type="number" v-model="filterObject.ageMax" placeholder="Nejvýše dní" />
+                            <input type="number" v-model="filterObject.ageMin" placeholder="Alespoň dní" min="0" />
+                            <input type="number" v-model="filterObject.ageMax" placeholder="Nejvýše dní" min="0" />
                         </div>
                         <div class="label">Kategorie</div>
                         <div class="checkbox-grid">
-                            <div v-for="(label, item) in propertyCodes" :key="item">
+                            <div v-for="(label, item) in PropertyLabels" :key="item">
                                 <input type="checkbox" :id="label" v-model="filterObject.property[item]" />
                                 <label :for="label">{{ label }}</label>
                             </div>
                         </div>
-                        <div class="label">Typ</div>
+                        <div class="label">Nabídka</div>
                         <div class="checkbox-grid">
-                            <div v-for="(label, item) in deals" :key="item">
+                            <div v-for="(label, item) in DealLabels" :key="item">
                                 <input type="checkbox" :id="label" v-model="filterObject.deal[item]" />
                                 <label :for="label">{{ label }}</label>
                             </div>
@@ -62,27 +79,45 @@
 
                         <div class="label">Vlastnictví</div>
                         <div class="checkbox-grid">
-                            <div v-for="(label, item) in ownerships" :key="item">
+                            <div v-for="(label, item) in OwnershipLabels" :key="item">
                                 <input type="checkbox" :id="'o' + label" v-model="filterObject.ownership[item]" />
                                 <label :for="'o' + label">{{ label }}</label>
                             </div>
                         </div>
-                        <template  v-if="expandFilter">
-                            <div></div>
-                            <div class="checkbox-grid" >
-                                <div v-for="(label, item) in categoryCodes" :key="item">
-                                    <input type="checkbox" :id="label" v-model="filterObject.sub[item]" />
-                                    <label :for="label">{{ label }}</label>
-                                </div>
-                            </div>
-                        </template>    
-                        <div class="expand-filter">
-                            <span @click="expandFilter = !expandFilter">
-                                Zobrazit {{ expandFilter ? 'méně' : 'více' }}
-                            </span>
-                        </div>
-                    </div>
 
+                    </div>
+                    <div class="overflow-hidden">
+                        <Transition name="expand">
+                            <div class="form-grid" v-if="expandFilter">
+
+                                <template v-for="prop in PropertyCodes" :key="prop">
+                                    <div class="label">{{ subcategoryFormLabels[prop] }}</div>
+
+                                    <div class="checkbox-grid">
+                                        <div v-for="(label, item) in SubcategoryLabels[prop]" :key="item">
+
+                                            <input type="checkbox" :id="label"
+
+                                                   v-model="filterObject.subcategory[item]" />
+                                            <label :for="label">{{ label }}</label>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div class="label">Smazané inzeráty</div>
+                                <div>
+                                    <input type="checkbox" id="deleted" v-model="filterObject.deleted" />
+                                    <label for="deleted"> Zobrazit smazané</label>
+                                </div>
+
+
+                            </div>
+                        </Transition>
+                    </div>
+                    <div class="expand-filter">
+                        <span @click="expandFilter = !expandFilter">
+                            Zobrazit {{ expandFilter ? 'méně' : 'více' }}
+                        </span>
+                    </div>
                     <h2>
                         <collapse-button v-model="collapseMunicipalityPanel" />
                         Města
@@ -108,6 +143,7 @@ import MunicipalityPanel from "./MunicipalityPanel.vue";
 import { FilterObject } from "@/class/FilterObject";
 import { MunicipalityObject } from "@/class/MunicipalityObject";
 import CollapseButton from "./CollapseButton.vue";
+import { DealLabels, PropertyLabels, OwnershipLabels, SubcategoryLabels, Property, PropertyCodes, PropertyType } from "@/class/types"
 
 export default defineComponent({
     components: {
@@ -149,25 +185,17 @@ export default defineComponent({
             collapseAll: false,
             collapseMunicipalityPanel: false,
             municipalities: [] as Array<MunicipalityObject>,
-            deals: { 1: "Prodej", 2: "Pronájem", 3: "Dražba" },
-            propertyCodes: { 1: "Byty", 2: "Domy", 3: "Pozemky", 4: "Komerční", 5: "Jiné" },
-            categoryCodes: {
-                2: "1+kk",
-                3: "1+1",
-                4: "2+kk",
-                5: "2+1",
-                6: "3+kk",
-                7: "3+1",
-                8: "4+kk",
-                9: "4+1",
-                10: "5+kk",
-                11: "5+1",
-                12: "6 a více",
-                0: "Neuvedeno",
-            },
-            ownerships: { 1: "Osobní", 2: "Družstevní", 3: "Statní/Obecní", 0: "Neuvedeno" },
             filterObject: new FilterObject(),
             searchType: "str" as "str" | "loc",
+            subcategoryFormLabels: {
+                [Property.apartment]: "Typ bytu",
+                [Property.commercial]: "Typ komerčních nemovitostí",
+                [Property.parcel]: "Typ pozemku",
+                [Property.house]: "Typ domu",
+                [Property.other]: "Typ - jiné",
+            } as { [key in PropertyType]: string },
+            DealLabels, PropertyLabels, OwnershipLabels, SubcategoryLabels,
+            Property, PropertyCodes: PropertyCodes as Array<PropertyType>
         };
     },
 });
@@ -175,20 +203,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import "../style/forms.scss";
+@import "../style/animation-expand.scss";
 
 .overflow-hidden {
     overflow: hidden;
-}
-
-.expand-enter-active,
-.expand-leave-active {
-    transition: all 0.5s ease-in;
-}
-
-.expand-enter-from,
-.expand-leave-to {
-    margin-top: -90%;
-    opacity: 0;
 }
 
 .expand-filter {
@@ -200,5 +218,4 @@ export default defineComponent({
     text-decoration: underline;
     cursor: pointer;
 }
-
 </style>

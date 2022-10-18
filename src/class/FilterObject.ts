@@ -1,21 +1,27 @@
 import { GeoObject } from "./GeoObject";
-import { DealType, OwnershipType, PropertyType, SubCategoryType } from "./types";
+import { DealType, OwnershipType, PropertyCodes, PropertyType } from "./types";
 
 export class FilterObject {
     query?: string;
     priceMin?: number;
     priceMax?: number;
+    rentMin?: number;
+    rentMax?: number;
     priceDropPercent?: number;
     priceDropCZK?: number;
     pricePerMeterMin?: number;
     pricePerMeterMax?: number;
+    rentPerMeterMin?: number;
+    rentPerMeterMax?: number;
     ageMin?: number;
     ageMax?: number;
+    deleted?: boolean;
     deal: { [key in DealType]?: boolean } = {};
     property: { [key in PropertyType]?: boolean } = {};
-    sub: { [key in SubCategoryType]?: boolean } = {};
+    subcategory: { [key: number]: boolean }  = {} ;
     ownership: { [key in OwnershipType]?: boolean } = {};
     location?: GeoObject;
+
 
     toParams(): any {
         const obj = {} as any;
@@ -24,12 +30,17 @@ export class FilterObject {
             "query",
             "priceMin",
             "priceMax",
-            "priceDropPercent",
-            "priceDropCZK",
+            "rentMin",
+            "rentMax",
             "pricePerMeterMin",
             "pricePerMeterMax",
+            "rentPerMeterMin",
+            "rentPerMeterMax",
+            "priceDropPercent",
+            "priceDropCZK",
             "ageMin",
             "ageMax",
+            "deleted",
         ];
 
         for (const key of keys) {
@@ -37,7 +48,7 @@ export class FilterObject {
             if (this[key]) obj[key] = this[key];
         }
 
-        keys = ["deal", "property", "sub", "ownership"];
+        keys = ["deal", "property", "subcategory",  "ownership"];
 
         for (const key of keys) {
             // @ts-ignore
@@ -48,6 +59,8 @@ export class FilterObject {
                     .map(([k, v]) => k);
             }
         }
+
+        /** todo sub */
 
         if (this.location) {
             obj.lat = this.location.userData.latitude;

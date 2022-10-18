@@ -105,6 +105,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@import "../style/forms.scss";
+
 .autocomplete {
     position: relative;
 }

@@ -16,28 +16,40 @@ $inputWidth: 150px;
 }
 
 .form-grid {
-    padding: 10px 0;
-    display: grid;
-    grid-template-columns: minmax(100px, auto) 1fr;
-    align-items: center;
     gap: 10px;
+    display: flex;
+    flex-direction: column;
+    
+    @media only screen and (min-width: 768px) {
+        padding: 10px 0;
+        display: grid;
+        grid-template-columns: 15% 1fr;
+        align-items: baseline;
+
+        .label {
+            text-align: right;
+        }
+
+    }
 
     .label {
-        text-align: right;
         font-weight: bold;
-        align-self: baseline;
-        padding-top: .5em;
+        align-self: baseline;    
         color: brown;
     }
 
-    & > div {
-        min-height: 2.5em;
-    }
+
 }
 
 .checkbox-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1em;
+
+    @media only screen and (min-width: 768px) {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
 
     & > div {
         display: flex;
@@ -49,6 +61,7 @@ $inputWidth: 150px;
 .checkbox-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    gap: 1em;
 }
 
 button {
