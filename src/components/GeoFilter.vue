@@ -2,14 +2,14 @@
     <div class="autocomplete">
         <div class="flex">
             <input
-                type="text"
-                ref="input"
-                placeholder="Hledání místa..."
-                v-model="searchString"
-                @input="suggestDebounced"
-                @focus="setFocus(true)"
-                @blur="setFocus(false)"
-            />
+                   type="text"
+                   ref="input"
+                   placeholder="Hledání místa..."
+                   v-model="searchString"
+                   @input="suggestDebounced"
+                   @focus="setFocus(true)"
+                   @blur="setFocus(false)"
+                   data-tooltip="Vyhledávání podle místa funguje na principu hledání v kruhu kolem bodu. Když se zvolí lokalita,  program dostane jeden bod, který je někde uprostřed (to platí i pro města), a pak hledá v kruhu o zadaném poloměru. Je nutné zvolit něco z našeptávače, do pole s vyhledáváním se pak doplní pouze první řádek výsledku našeptávače, to neznamená, hledá se ale opravdu podle vybrané položky. Lokality v našeptávači jsou z externího api Mapy.cz." />
             <span>v okruhu</span>
             <input type="number" class="short" v-model="radius" />
             <span>km</span>
@@ -38,9 +38,11 @@ export default defineComponent({
         return {
             suggestions: {
                 count: 0,
+                // eslint-disable-next-line
                 data: {} as any,
             },
-            searchString: "",
+            searchString: this.modelValue?.userData?.suggestFirstRow ?? "",
+            // eslint-disable-next-line
             selectedLocality: this.modelValue as any,
             radius: 10,
             focus: false,
@@ -54,7 +56,7 @@ export default defineComponent({
             }
         },
         radius() {
-            if(this.selectedLocality) {
+            if (this.selectedLocality) {
                 this.selectedLocality.radius = this.radius;
                 this.$emit("update:modelValue", this.selectedLocality);
             }
@@ -121,6 +123,7 @@ export default defineComponent({
 .autocomplete-item {
     font-size: 10pt;
     cursor: pointer;
+
     &:hover {
         background-color: lightgray;
     }

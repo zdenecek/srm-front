@@ -1,6 +1,100 @@
-
-.label-prop-1 {
-
-
-    content: "Dům";
+.top-labels {
+color: white;
+font-weight: bold;
+display: flex;
+gap: 10px;
 }
+
+.top-label {
+border-radius: 4px;
+padding: 1px 5px ;
+cursor: default;
+display: flex;
+justify-content: center;
+align-items: center;
+user-select: none;
+}
+
+
+.top-label-prop-1 {
+background-color: #003f5c;
+}
+.top-label-prop-2 {
+background-color: #58508d;
+}
+.top-label-prop-3 {
+background-color: #bc5090;
+}
+.top-label-prop-4 {
+background-color: #ff6361;
+}
+.top-label-prop-5 {
+background-color: #ffa600;
+}
+
+.top-label-deal-1 {
+background-color: #bbd700;
+}
+.top-label-deal-2 {
+background-color: #7385de;
+}
+.top-label-deal-3 {
+background-color: #00aeef;
+}
+
+.top-label-ownership-1 {
+background-color: green;
+}
+.top-label-ownership-2 {
+background-color: greenyellow;
+}
+.top-label-ownership-3 {
+background-color: darkkhaki;
+}
+.top-label-ownership-3 {
+background-color: olive;
+}
+
+.top-label-price-drop {
+    box-shadow: 0 0 5px 1px brown;
+
+}
+
+.top-label-price-drop-50 {
+    background-color: red;
+    box-shadow: 0 0 10px 5px red;
+}
+.top-label-price-drop-40 {
+    background-color: red;
+    box-shadow: 0 0 10px 2px orangered;
+
+}
+.top-label-price-drop-30 {
+    background-color: red;
+    box-shadow: 0 0 10px 1px orange;
+
+}
+.top-label-price-drop-25 {
+    background-color: lighten($color: darkred, $amount: 0);
+}
+.top-label-price-drop-20 {
+    background-color: lighten($color: darkred, $amount: 10);
+}
+.top-label-price-drop-15 {
+    background-color: lighten($color: darkred, $amount: 20);
+}
+.top-label-price-drop-10 {
+    background-color: lighten($color: darkred, $amount: 40);
+}
+.top-label-price-drop-7 {
+    background-color: lighten($color: darkred, $amount: 50);
+}
+.top-label-price-drop-3 {
+    background-color: lighten($color: darkred, $amount: 60);
+}
+
+.top-label-sub {
+background-color: brown;
+}
+
+

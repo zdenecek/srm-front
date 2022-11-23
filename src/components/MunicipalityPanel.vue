@@ -1,6 +1,8 @@
 <template>
     <div class="form-grid">
-        <div class="label">Zamknout</div>
+        <div class="label">Zamknout
+            <Tooltip tip="Při zamčení nebude výčet měst ovlivňován dalšími změnami filtru. Počet měst se zamkne a při změně filtru nebudou aktualizovány."/>
+        </div>
         <div class="lock" @click="toggleLock">
             <svg
                 v-show="!locked"
@@ -38,7 +40,7 @@
                 <circle cx="12" cy="16" r="1"></circle>
                 <path d="M8 11v-4a4 4 0 0 1 8 0v4"></path>
             </svg>
-            <span>(Výčet měst nebude ovlivňovám dalšími změnami filtru)</span>
+            <span></span>
         </div>
         <div class="label">Počet inzerátů ve městě</div>
         <div class="checkbox-grid">
@@ -87,13 +89,17 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import _, { update } from "lodash";
+import _ from "lodash";
 import axios from "axios";
 import { FilterObject } from "@/class/FilterObject";
 import RangeObject from "@/class/RangeObject";
 import { MunicipalityObject, compare } from "@/class/MunicipalityObject";
+import Tooltip from "./Tooltip.vue";
 
 export default defineComponent({
+    components: {
+        Tooltip
+    },
     props: {
         filter: FilterObject,
     },
@@ -124,14 +130,16 @@ export default defineComponent({
         },
         customRange: {
             handler: function () {
-                if (this.customSelected) this.updateDebounced();
+                if (this.customSelected)
+                    this.updateDebounced();
             },
             deep: true,
         },
         filter: {
             handler() {
-                if(this.initial) return;
-                if(this.locked) {
+                if (this.initial)
+                    return;
+                if (this.locked) {
                     this.filterChangedWhenLocked = true;
                     return;
                 }
@@ -141,10 +149,7 @@ export default defineComponent({
         },
         municipalities: {
             handler() {
-                this.$emit(
-                    "update",
-                    this.municipalities.filter((a) => a.selected)
-                );
+                this.$emit("update", this.municipalities.filter((a) => a.selected));
             },
             deep: true,
         },
@@ -152,7 +157,7 @@ export default defineComponent({
     methods: {
         toggleLock() {
             this.locked = !this.locked;
-            if(!this.locked && this.filterChangedWhenLocked) {
+            if (!this.locked && this.filterChangedWhenLocked) {
                 this.filterChangedWhenLocked = false;
                 this.updateDebounced();
             }
@@ -160,21 +165,19 @@ export default defineComponent({
         update() {
             this.loading = true;
             const ranges = this.selectedRanges.map((a: RangeObject) => `${a.min}-${a.max}`);
-
             if (this.customSelected) {
                 ranges.push(`${this.customRange.min}-${this.customRange.max}`);
             }
-
             axios
                 .get("/municipalities", {
-                    params: { ...this.filter?.toParams(), ranges },
-                })
+                params: { ...this.filter?.toParams(), ranges },
+            })
                 .then((response) => {
-                    this.municipalities = response.data;
-                    this.municipalities.sort(compare);
-                    this.loading = false;
-                    this.initial = false;
-                });
+                this.municipalities = response.data;
+                this.municipalities.sort(compare);
+                this.loading = false;
+                this.initial = false;
+            });
         },
         updateDebounced() {
             return;

@@ -1,8 +1,21 @@
 <template>
     <div class="listing">
-        <div class ="header">
-            <div class="labels"> </div>
+        <div class="header">
             <div class="heading">{{ data?.title ?? "Inzerát" }}, {{ address }}</div>
+            <div class="top-labels">
+                <span v-if="data?.prop" :class="'top-label top-label-prop top-label-prop-' + data.prop"> {{ propLabel }}
+                </span>
+                <span v-if="data?.deal" :class="'top-label top-label-deal top-label-deal-' + data.deal"> {{ dealLabel }}
+                </span>
+                <span v-if="data?.ownership"
+                      :class="'top-label top-label-ownership top-label-ownership-' + data.ownership"> {{ ownershipLabel
+                      }} </span>
+                <span v-if="priceDropLabel"
+                      :class="'top-label top-label-price-drop top-label-price-drop-' + priceDropLabel"> {{ priceDrop
+                      }} </span>
+                <span v-if="data?.sub" :class="'top-label top-label-sub top-label-sub-' + data.sub"> {{ subLabel }}
+                </span>
+            </div>
         </div>
         <div class="images">
             <div v-for="image in data?.images" :key="image.view">
@@ -22,6 +35,10 @@
                 <span>Stáří</span>
                 <span>{{ age }}</span>
             </div>
+            <div class="listing-label" v-if="priceDrop">
+                <span>Sleva</span>
+                <span>{{priceDrop}}</span>
+            </div>
         </div>
         <div class="actions">
             <div class="button" @click="toggleDetails">Zobrazit detaily</div>
@@ -38,10 +55,7 @@
                     <checkmark v-if="item === false || item === true" :value="item"></checkmark>
                     <span v-else>{{ item }}</span>
                 </div>
-                <div class="listing-label" v-if="priceDrop">
-                    <span>Sleva</span>
-                    <span>{{priceDrop}}</span>
-                </div>
+
             </div>
             <div class="meta">
                 <div>
@@ -54,32 +68,57 @@
 </template>
 
 <script lang="ts">
-import { Ownership } from "@/class/types";
+import { Ownership, OwnershipLabels, OwnershipType, PropertyType } from "@/class/types";
 import { defineComponent, PropType } from "vue";
 import PriceChart from "./PriceChart.vue";
 import Checkmark from "./Checkmark.vue";
-import {PropertyLabels, PropertyCodes} from "@/class/types";
+import { PropertyLabels, PropertyCodes, DealLabels, SubcategoryLabels } from "@/class/types";
 
 export default defineComponent({
     name: "Listing",
     components: {
         PriceChart,
         Checkmark,
+
     },
     props: {
         data: Object,
-        autoexpand:  Boolean  as PropType<boolean>,
+        autoexpand: Boolean as PropType<boolean>,
     },
     created() {
-        if(this.autoexpand) this.showDetails = true;
+        if (this.autoexpand) this.showDetails = true;
     },
     data() {
         return {
             showDetails: false,
-            PropertyLabels, PropertyCodes
+            PropertyLabels, PropertyCodes, DealLabels, SubcategoryLabels
         };
     },
     computed: {
+        priceDropLabel() {
+            if (this.data?.priceDropPercent >= 0.5) return 50;
+            if (this.data?.priceDropPercent >= 0.4) return 40;
+            if (this.data?.priceDropPercent >= 0.3) return 30;
+            if (this.data?.priceDropPercent >= 0.25) return 25;
+            if (this.data?.priceDropPercent >= 0.2) return 20;
+            if (this.data?.priceDropPercent >= 0.15) return 15;
+            if (this.data?.priceDropPercent >= 0.10) return 10;
+            if (this.data?.priceDropPercent >= 0.075) return 7;
+            if (this.data?.priceDropPercent >= 0.03) return 3;
+            return false;
+        },
+        propLabel() {
+            return PropertyLabels[this.data?.prop as PropertyType];
+        },
+        ownershipLabel() {
+            return OwnershipLabels[this.data?.ownership as OwnershipType];
+        },
+        dealLabel() {
+            return DealLabels[this.data?.deal as PropertyType];
+        },
+        subLabel() {
+            return SubcategoryLabels[this.data?.prop][this.data?.sub];
+        },
         webUrl() {
             return 'https://' + this.data?.url;
         },
@@ -89,7 +128,7 @@ export default defineComponent({
         price() {
             let s = this.data?.price?.toLocaleString() + " Kč" ?? "-";
             if (this.data?.priceUnit) s += " " + this.data?.priceUnit;
-            if (this.data?.pricePerMeter) s += ` (${Math.round(this.data?.pricePerMeter).toLocaleString()} Kč/m²)`;
+            if (this.data?.pricePerMeter) s += ` (${Math.floor(this.data?.pricePerMeter).toLocaleString()} Kč/m²)`;
 
             return this.data?.price ? s : "-";
         },
@@ -107,7 +146,7 @@ export default defineComponent({
             return Ownership[this.data?.ownership] ?? false;
         },
         priceDrop() {
-            return this.data?.priceDropPercent > 0 ? `${this.data?.priceDropPercent} %` : false;
+            return this.data?.priceDropPercent > 0 ? `${Math.round(this.data?.priceDropPercent * 100)} %` : false;
         },
         address() {
             return this.data?.address ?? this.data?.locality?.name ?? "";
@@ -115,7 +154,7 @@ export default defineComponent({
     },
     methods: {
         toggleDetails() {
-            this.showDetails = ! this.showDetails;
+            this.showDetails = !this.showDetails;
         }
     }
 });
@@ -124,10 +163,9 @@ export default defineComponent({
 <style lang="scss">
 @import "../style/labels.scss";
 
-
 .button {
     text-decoration: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 2px 6px;
@@ -136,9 +174,22 @@ export default defineComponent({
     color: white;
     font-weight: bold;
     cursor: pointer;
+    transition: all .5s;
 
     &:hover {
         background: brown;
+        color: white;
+    }
+
+    &.light {
+        background-color: white;
+        color: brown;
+        border: brown solid 1px;
+
+        &:hover {
+        background: brown;
+        color: white;
+        }
     }
 }
 
@@ -157,12 +208,17 @@ export default defineComponent({
 .header {
     outline: solid brown 1px;
     background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
+
+
 
 .heading {
     color: brown;
     font-size: 1.5em;
-   
+
 }
 
 .images {

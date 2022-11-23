@@ -66,17 +66,51 @@
     <h2>Historie verzí</h2>
     <ul>
         <li>
-            18.10.2022
+            23.11.2022
+            <ul>
+                <li>Web: Oprava chyby v řazení</li>
+            </ul>
         </li>
-        <ul>
-            <li>Scraper: Oprava přepisování historie cen novější cenou</li>
-            <li>Scraper: Scraper ověřuje, jestli nějaký smazaný inzerát nebyl znovu objeven</li>
-            <li>Databáze: Oprava nekonzistentních dat</li>
-            <li>Databáze: Vytvoření indexů - id, datum vložení</li>
-            <li>Web: Rozdělení filtrů na cenu na nájem a cenu prodeje</li>
-            <li>Web: Přidání filtrů typu i u inzerátů, které nejsou na byt</li>
-            <li>Web: Lze zobrazit smazané inzeráty</li>
-        </ul>
+        <li>
+            14.11.2022
+            <ul>
+                <li>Web: Přidáno řazení</li>
+                <li>Web: Filtr je nyní perzistentní - při zachování url adresy zůstane filtr i při obnovení stránky.
+                    Lze uložit url pro uložení filtru. Přidáno tlačítko vyčištění filtru.
+                </li>
+                <li>Scraper: Scraper umí u inzerátů, kde není cena uvedena jako cena, nýbrž jako položky Původní cena a Zlevněno, správně rozpoznat cenu.
+                </li>
+            </ul>
+        </li>
+        <li>
+            22.10.2022
+            <ul>
+                <li>Web: Změna barevného schématu labelů kvůli čitelnosti</li>
+                <li>Scraper: Oprava</li>
+            </ul>
+        </li>
+        <li>
+            19.10.2022
+            <ul>
+                <li>Web: Oprava filtru slevy</li>
+                <li>Web: Přidání nápověd pro dva prvky</li>
+                <li>Web: Přidání barevných labelů</li>
+            </ul>
+        </li>
+        <li>
+            18.10.2022
+            <ul>
+                <li>Scraper: Oprava přepisování historie cen novější cenou</li>
+                <li>Scraper: Scraper ověřuje, jestli nějaký smazaný inzerát nebyl znovu objeven</li>
+                <li>Databáze: Oprava nekonzistentních dat</li>
+                <li>Databáze: Vytvoření indexů - id, datum vložení</li>
+                <li>Web: Rozdělení filtrů na cenu na nájem a cenu prodeje</li>
+                <li>Web: Přidání filtrů typu i u inzerátů, které nejsou na byt</li>
+                <li>Web: Lze zobrazit smazané inzeráty</li>
+            </ul>
+        </li>
+       
+        
     </ul>
 </template>
 

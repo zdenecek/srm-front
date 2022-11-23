@@ -1,5 +1,28 @@
+import { initial, isArray } from "lodash";
+import { onlyUnique } from "./functions";
 import { GeoObject } from "./GeoObject";
 import { DealType, OwnershipType, PropertyCodes, PropertyType } from "./types";
+
+export type OrderingOption = "priceDrop" | "age" | "price" | "pricePerMeter";
+
+export class Ordering {
+    key: OrderingOption;
+    desc: boolean;
+
+    constructor(key: OrderingOption, desc: boolean) {
+        this.key = key;
+        this.desc = desc;
+    }
+
+    public toString(): string {
+        return `${this.key}:${this.desc}`;
+    }
+
+    static fromString(s: string): Ordering {
+        const split = s.split(":");
+        return new Ordering(split[0] as OrderingOption, split[1] !== "0");
+    }
+}
 
 export class FilterObject {
     query?: string;
@@ -8,7 +31,7 @@ export class FilterObject {
     rentMin?: number;
     rentMax?: number;
     priceDropPercent?: number;
-    priceDropCZK?: number;
+    priceDropCzk?: number;
     pricePerMeterMin?: number;
     pricePerMeterMax?: number;
     rentPerMeterMin?: number;
@@ -18,12 +41,12 @@ export class FilterObject {
     deleted?: boolean;
     deal: { [key in DealType]?: boolean } = {};
     property: { [key in PropertyType]?: boolean } = {};
-    subcategory: { [key: number]: boolean }  = {} ;
+    subcategory: { [key: number]: boolean } = {};
     ownership: { [key in OwnershipType]?: boolean } = {};
     location?: GeoObject;
+    orderBy = new Array<Ordering>();
 
-
-    toParams(): any {
+    toParams(): Record<string, unknown> {
         const obj = {} as any;
 
         let keys = [
@@ -37,7 +60,7 @@ export class FilterObject {
             "rentPerMeterMin",
             "rentPerMeterMax",
             "priceDropPercent",
-            "priceDropCZK",
+            "priceDropCzk",
             "ageMin",
             "ageMax",
             "deleted",
@@ -48,7 +71,7 @@ export class FilterObject {
             if (this[key]) obj[key] = this[key];
         }
 
-        keys = ["deal", "property", "subcategory",  "ownership"];
+        keys = ["deal", "property", "subcategory", "ownership"];
 
         for (const key of keys) {
             // @ts-ignore
@@ -68,6 +91,88 @@ export class FilterObject {
             obj.radius = this.location.radius;
         }
 
+        if (this.orderBy.length > 0) {
+            const o = new Set();
+            obj.orderBy = [];
+            this.orderBy.forEach((e, i) => {
+                if (o.has(e.key)) return;
+                o.add(e.key);
+                obj.orderBy.push(`${i}:${e.key}:${e.desc ? "desc" : "asc"}`);
+            });
+        }
+
         return obj;
+    }
+
+    static fromParams(params: Record<string, unknown>): FilterObject {
+        const f = new FilterObject();
+
+        let keys = [
+            "query",
+            "priceMin",
+            "priceMax",
+            "rentMin",
+            "rentMax",
+            "pricePerMeterMin",
+            "pricePerMeterMax",
+            "rentPerMeterMin",
+            "rentPerMeterMax",
+            "priceDropPercent",
+            "priceDropCzk",
+            "ageMin",
+            "ageMax",
+            "deleted",
+        ];
+
+        for (const key of keys) {
+            // @ts-ignore
+            if (params[key]) f[key] = params[key];
+        }
+
+        keys = ["deal", "property", "subcategory", "ownership"];
+
+        for (const key of keys) {
+            // @ts-ignore
+            if (key in params) {
+                // @ts-ignore
+                for (const s of params[key].split(",")) {
+                    // @ts-ignore
+                    f[key][s] = true;
+                }
+            }
+        }
+
+        if ("lat" in params) {
+            f.location = {
+                // @ts-ignore
+                userData: {
+                    latitude: parseFloat(params.lat as string),
+                    longitude: parseFloat(params.lon as string),
+                    suggestFirstRow: `<z dřív. vyhledávání>`,
+                },
+                radius: parseInt(params.radius as string) ?? 10,
+            };
+        }
+
+        // @ts-ignore
+        if ("orderBy" in params) {
+            f.orderBy = [];
+
+            if (Array.isArray(params.orderBy) && params.orderBy.length > 0) {
+                // @ts-ignore
+                const list = params.orderBy.map((o) => o.split(":"));
+                list.forEach((o) => (o[0] = parseInt(o[0])));
+                // @ts-ignore
+                list.sort((o) => o[0]);
+                // @ts-ignore
+                f.orderBy = list.map((o) => new Ordering(o[1], o[2] === "desc"));
+            } else {
+                // @ts-ignore
+                const split = params.orderBy.split(":");
+                f.orderBy.push(new Ordering(split[1], split[2] === "desc"));
+            }
+        }
+
+        return f;
     }
 }

@@ -1,20 +1,27 @@
 <template>
     <div class="flex-col">
-        <h1>
-            <collapse-button v-model="collapseAll" />
-            Filtr a vyhledávání
-        </h1>
+        <div class="flex">
+            <h1>
+                <collapse-button v-model="collapseAll" />
+                <span>Filtr a vyhledávání</span>
+            </h1>
+            <span class="button light" @click="clearFilter">Vyčistit filtr</span>
+        </div>
         <div class="overflow-hidden">
             <Transition name="expand">
                 <form @submit.prevent="update" v-show="!collapseAll">
                     <div class="form-grid">
-                        <div class="label">Vyhledávání</div>
+                        <div class="label"><span>Vyhledávání</span>
+                        </div>
                         <div class="flex-col">
                             <div>
                                 <input type="radio" id="str" value="str" name="_search" v-model="searchType" />
-                                <label for="str">Řetězec</label>
+                                <label for="str">Řetězec
+                                </label>
                                 <input type="radio" id="loc" value="loc" name="_search" v-model="searchType" />
-                                <label for="loc">Místo</label>
+                                <label for="loc">Místo
+
+                                </label>
                             </div>
 
                             <input
@@ -39,9 +46,9 @@
                         <div class="flex">
                             <input type="number" v-model="filterObject.priceDropPercent" placeholder="Alespoň %" min="0"
                                    max="100"
-                                   step="0.05" />
-                            <input type="number" v-model="filterObject.priceDropCZK" placeholder="Alespoň Kč" min="0"
-                                   step="0.05" />
+                                   step="0.001" />
+                            <input type="number" v-model="filterObject.priceDropCzk" placeholder="Alespoň Kč" min="0"
+                                   step="1" />
                         </div>
                         <div class="label">Cena za plochu</div>
                         <div class="flex">
@@ -82,6 +89,28 @@
                             <div v-for="(label, item) in OwnershipLabels" :key="item">
                                 <input type="checkbox" :id="'o' + label" v-model="filterObject.ownership[item]" />
                                 <label :for="'o' + label">{{ label }}</label>
+                            </div>
+                        </div>
+                        <div class="label">
+                            <div class="flex">
+                                <span>Řazení</span>
+                                <span class="button light" v-show="canAddOrdering" @click="addOrdering">+</span>
+                            </div>
+
+                        </div>
+                        <div class="ordering">
+                            <div class="flex" v-for="ordering, index in filterObject.orderBy" :key="ordering.key">
+                                <span class="button light" @click="filterObject.orderBy.splice(index, 1)">-</span>
+                                <span>{{ index + 1 }}.</span>
+                                <select v-model="ordering.key">
+                                    <option v-for="opt, key in orderByOptions" :key="key" :value="key">{{ opt.label }}
+                                    </option>
+                                </select>
+                                <select v-model="ordering.desc">
+                                    <option :value="true">{{ orderByOptions[ordering.key].descLabel }}</option>
+                                    <option :value="false">{{ orderByOptions[ordering.key].ascLabel }}</option>
+                                </select>
+
                             </div>
                         </div>
 
@@ -140,16 +169,19 @@
 import { defineComponent } from "vue";
 import GeoFilter from "./GeoFilter.vue";
 import MunicipalityPanel from "./MunicipalityPanel.vue";
-import { FilterObject } from "@/class/FilterObject";
+import { FilterObject, OrderingOption } from "@/class/FilterObject";
 import { MunicipalityObject } from "@/class/MunicipalityObject";
 import CollapseButton from "./CollapseButton.vue";
-import { DealLabels, PropertyLabels, OwnershipLabels, SubcategoryLabels, Property, PropertyCodes, PropertyType } from "@/class/types"
+import { DealLabels, PropertyLabels, OwnershipLabels, SubcategoryLabels, Property, PropertyCodes, PropertyType } from "@/class/types";
+import 'tippy.js/dist/tippy.css';
+// import Tooltip from "./Tooltip.vue";
 
 export default defineComponent({
     components: {
         GeoFilter,
         MunicipalityPanel,
         CollapseButton,
+        // Tooltip
     },
     emits: ["update"],
     watch: {
@@ -170,11 +202,29 @@ export default defineComponent({
     methods: {
         update() {
             this.$emit("update", this.filterObject, this.municipalities);
+
+            this.$router.push({ query: this.filterObject.toParams() as any });
         },
         updateMunicipalities(municipalities: Array<MunicipalityObject>) {
             this.municipalities = municipalities;
             this.update();
         },
+        clearFilter() {
+            this.filterObject = new FilterObject();
+        },
+        addOrdering() {
+            const remainingFilters = Object.keys(this.orderByOptions).filter(k => this.filterObject.orderBy.every(o => o.key != k))
+
+            this.filterObject.orderBy.push({
+                desc: false,
+                key: remainingFilters[0] as OrderingOption ?? "age",
+            });
+        },
+    },
+    computed: {
+        canAddOrdering(): boolean {
+            return this.filterObject.orderBy.length < Object.values(this.orderByOptions).length;
+        }
     },
     mounted() {
         if (this.$route.query.id) this.collapseAll = true;
@@ -185,7 +235,13 @@ export default defineComponent({
             collapseAll: false,
             collapseMunicipalityPanel: false,
             municipalities: [] as Array<MunicipalityObject>,
-            filterObject: new FilterObject(),
+            orderByOptions: {
+                priceDrop: { label: "Sleva", descLabel: "Sestupně", ascLabel: "Vzestupně" },
+                age: { label: "Stáří", descLabel: "Od nejnovějších", ascLabel:"Od nejstarších" , },
+                price: { label: "Cena/Nájem", descLabel: "Sestupně", ascLabel: "Vzestupně" },
+                pricePerMeter: { label: "Cena/Nájem na plochu", descLabel: "Sestupně", ascLabel: "Vzestupně" },
+            },
+            filterObject: FilterObject.fromParams(this.$route.query),
             searchType: "str" as "str" | "loc",
             subcategoryFormLabels: {
                 [Property.apartment]: "Typ bytu",
@@ -207,6 +263,24 @@ export default defineComponent({
 
 .overflow-hidden {
     overflow: hidden;
+}
+
+.ordering {
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    select {
+        height: 1.7em;
+        border: brown solid 1px;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .button {
+        width: 1.7em;
+    }
 }
 
 .expand-filter {

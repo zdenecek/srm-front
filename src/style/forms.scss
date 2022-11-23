@@ -36,6 +36,11 @@ $inputWidth: 150px;
         font-weight: bold;
         align-self: baseline;    
         color: brown;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px;
     }
 
 
