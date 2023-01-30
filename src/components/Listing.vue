@@ -15,6 +15,7 @@
                       }} </span>
                 <span v-if="data?.sub" :class="'top-label top-label-sub top-label-sub-' + data.sub"> {{ subLabel }}
                 </span>
+                <span v-if="data?.deleted" class="top-label top-label-deleted"> Smazaný inzerát </span>
             </div>
         </div>
         <div class="images">
@@ -43,6 +44,7 @@
         <div class="actions">
             <div class="button" @click="toggleDetails">Zobrazit detaily</div>
             <a class="button" :href="webUrl" target="_blank">Otevřít na sreality</a>
+            <a class="button" :href="detailUrl" target="_blank">Detail inzerátu</a>
             <a class="button" :href="data?.apiUrl" target="_blank">Api</a>
         </div>
         <div class="details" v-show="showDetails">
@@ -60,7 +62,7 @@
             <div class="meta">
                 <div>
                     <h3>Vývoj cen</h3>
-                    <price-chart class="chart" :data="priceHistory"></price-chart>
+                    <price-chart class="chart" :data="chartData"></price-chart>
                 </div>
             </div>
         </div>
@@ -71,7 +73,7 @@
 import { Ownership, OwnershipLabels, OwnershipType, PropertyType } from "@/class/types";
 import { defineComponent, PropType } from "vue";
 import PriceChart from "./PriceChart.vue";
-import Checkmark from "./Checkmark.vue";
+import Checkmark from "./partial/Checkmark.vue";
 import { PropertyLabels, PropertyCodes, DealLabels, SubcategoryLabels } from "@/class/types";
 
 export default defineComponent({
@@ -95,6 +97,12 @@ export default defineComponent({
         };
     },
     computed: {
+        chartData() {
+            return {
+                priceHistory: this.data?.priceHistory,
+                deleted: this.data?.deleted,
+            }
+        },
         priceDropLabel() {
             if (this.data?.priceDropPercent >= 0.5) return 50;
             if (this.data?.priceDropPercent >= 0.4) return 40;
@@ -122,6 +130,10 @@ export default defineComponent({
         webUrl() {
             return 'https://' + this.data?.url;
         },
+        detailUrl() {
+            return "/listing/" + this.data?.id ;
+        },
+      
         description() {
             return this.data?.description ?? '-';
         },

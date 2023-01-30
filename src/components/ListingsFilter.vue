@@ -168,10 +168,10 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import GeoFilter from "./GeoFilter.vue";
-import MunicipalityPanel from "./MunicipalityPanel.vue";
+import MunicipalityPanel from "./ListingsMunicipalityFilter.vue";
 import { FilterObject, OrderingOption } from "@/class/FilterObject";
 import { MunicipalityObject } from "@/class/MunicipalityObject";
-import CollapseButton from "./CollapseButton.vue";
+import CollapseButton from "./partial/CollapseButton.vue";
 import { DealLabels, PropertyLabels, OwnershipLabels, SubcategoryLabels, Property, PropertyCodes, PropertyType } from "@/class/types";
 import 'tippy.js/dist/tippy.css';
 // import Tooltip from "./Tooltip.vue";

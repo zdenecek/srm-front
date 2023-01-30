@@ -46,7 +46,7 @@ background-color: #00aeef;
 background-color: green;
 }
 .top-label-ownership-2 {
-background-color: greenyellow;
+background-color: rgb(123, 205, 0);
 }
 .top-label-ownership-3 {
 background-color: darkkhaki;
@@ -58,6 +58,11 @@ background-color: olive;
 .top-label-price-drop {
     box-shadow: 0 0 5px 1px brown;
 
+}
+
+.top-label-deleted {
+    background-color: red;
+    box-shadow: 0 0 5px 1px red;
 }
 
 .top-label-price-drop-50 {
