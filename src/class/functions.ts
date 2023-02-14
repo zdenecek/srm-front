@@ -1,3 +1,3 @@
-export function onlyUnique<T>(value: T, index: number, self: Array<T>) {
+export function onlyUnique<T>(value: T, index: number, self: Array<T>): boolean {
     return self.indexOf(value) === index;
 }

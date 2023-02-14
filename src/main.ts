@@ -1,12 +1,14 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import axios from "axios";
-import VueAwesomePaginate from "vue-awesome-paginate";
-import "vue-awesome-paginate/dist/style.css";
+// import VueAwesomePaginate from "vue-awesome-paginate";
+// import "vue-awesome-paginate/dist/style.css";
 import router from "./router";
 import { Chart, registerables } from "chart.js";
 import tippy from "tippy.js";
+import { createHead } from "@unhead/vue";
 
+const head = createHead();
 
 export const firefoxUrl = process.env.VUE_APP_FIREFOX_EXTENSION_DOWNLOAD_URI;
 export const chromeUrl = process.env.VUE_APP_CHROME_EXTENSION_DOWNLOAD_URI;
@@ -34,4 +36,7 @@ window.addEventListener("load", function () {
     });
 });
 
-createApp(App).use(router).use(VueAwesomePaginate).mount("#app");
+createApp(App)
+.use(router)
+.use(head)
+.mount("#app");

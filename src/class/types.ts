@@ -139,6 +139,8 @@ export enum OtherSubcategory {
     "jine-nemovitosti" = 36,
 }
 
+export type SubcategoryType = ApartmentSubcategoryType | HouseSubcategoryType | CommercialSubcategoryType | ParcelSubcategoryType | OtherSubcategoryType;
+
 export const SubcategoryCodes = {
     [Property.apartment]: ApartmentSubcategoryCodes,
     [Property.house]: HouseSubcategoryCodes,

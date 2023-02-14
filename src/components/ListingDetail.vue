@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span v-show="loading ">Inzerát se načítá...</span>
+        <span v-show="loading">Inzerát se načítá...</span>
         <div v-if="listing !== null">
             <listing :data="listing" :autoexpand="true"></listing>
         </div>
@@ -8,23 +8,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {  defineComponent } from "vue";
 import Listing from "@/components/Listing.vue";
 import axios from "axios";
+import { useHead } from '@unhead/vue';
 
 export default defineComponent({
     name: "ListingsDetail",
+
     components: {
         Listing,
     },
+
     data() {
         return {
             loading: true,
-            listing: null 
+            listing: null as any
         };
     },
 
     created() {
+
         this.getListing(this.$route.params.id as string);
     },
 
@@ -38,10 +42,11 @@ export default defineComponent({
             axios
                 .get(`listing/${id}`)
                 .then((response) => {
-                    console.log(response.data);
 
+                    console.log(response.data);
                     this.listing = response.data;
                     this.loading = false;
+                    useHead({  title: this.listing.title + ' | Sreality Manager'});
                 })
                 .catch((error) => {
                     console.error(error);

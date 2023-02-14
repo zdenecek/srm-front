@@ -1,9 +1,8 @@
-import { initial, isArray } from "lodash";
-import { onlyUnique } from "./functions";
 import { GeoObject } from "./GeoObject";
-import { DealType, OwnershipType, PropertyCodes, PropertyType } from "./types";
+import { DealType, OwnershipType, PropertyType } from "./types";
 
 export type OrderingOption = "priceDrop" | "age" | "price" | "pricePerMeter";
+export type DeletedOption = "deleted" | "active" | "all";
 
 export class Ordering {
     key: OrderingOption;
@@ -38,7 +37,7 @@ export class FilterObject {
     rentPerMeterMax?: number;
     ageMin?: number;
     ageMax?: number;
-    deleted?: boolean;
+    deleted?: DeletedOption;
     deal: { [key in DealType]?: boolean } = {};
     property: { [key in PropertyType]?: boolean } = {};
     subcategory: { [key: number]: boolean } = {};
@@ -78,8 +77,8 @@ export class FilterObject {
             if (Object.values(this[key]).some((v) => v)) {
                 // @ts-ignore
                 obj[key] = Object.entries(this[key])
-                    .filter(([k, v]) => v)
-                    .map(([k, v]) => k);
+                    .filter(([, v]) => v)
+                    .map(([k,]) => k);
             }
         }
 

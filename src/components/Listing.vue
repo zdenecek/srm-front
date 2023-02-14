@@ -1,21 +1,27 @@
 <template>
-    <div class="listing">
+    <div class="listing" :class="{ deleted: deleted && !showDetails }">
         <div class="header">
-            <div class="heading">{{ data?.title ?? "Inzerát" }}, {{ address }}</div>
+            <div class="heading">
+                <span v-if="data?.deleted" class="label-deleted"> Smazaný inzerát </span>
+                {{ data?.title ?? "Inzerát" }}, {{ address }}
+            </div>
             <div class="top-labels">
-                <span v-if="data?.prop" :class="'top-label top-label-prop top-label-prop-' + data.prop"> {{ propLabel }}
+                <span v-if="data?.prop" :class="'top-label top-label-prop top-label-prop-' + data.prop">
+                    {{ propLabel }}
                 </span>
-                <span v-if="data?.deal" :class="'top-label top-label-deal top-label-deal-' + data.deal"> {{ dealLabel }}
+                <span v-if="data?.deal" :class="'top-label top-label-deal top-label-deal-' + data.deal">
+                    {{ dealLabel }}
                 </span>
                 <span v-if="data?.ownership"
-                      :class="'top-label top-label-ownership top-label-ownership-' + data.ownership"> {{ ownershipLabel
-                      }} </span>
+                      :class="'top-label top-label-ownership top-label-ownership-' + data.ownership">
+                    {{ ownershipLabel }} </span>
                 <span v-if="priceDropLabel"
-                      :class="'top-label top-label-price-drop top-label-price-drop-' + priceDropLabel"> {{ priceDrop
-                      }} </span>
-                <span v-if="data?.sub" :class="'top-label top-label-sub top-label-sub-' + data.sub"> {{ subLabel }}
+                      :class="'top-label top-label-price-drop top-label-price-drop-' + priceDropLabel">
+                    {{ priceDrop }}
                 </span>
-                <span v-if="data?.deleted" class="top-label top-label-deleted"> Smazaný inzerát </span>
+                <span v-if="data?.sub" :class="'top-label top-label-sub top-label-sub-' + data.sub"> 
+                    {{ subLabel }}
+                </span>
             </div>
         </div>
         <div class="images">
@@ -38,7 +44,7 @@
             </div>
             <div class="listing-label" v-if="priceDrop">
                 <span>Sleva</span>
-                <span>{{priceDrop}}</span>
+                <span>{{ priceDrop }}</span>
             </div>
         </div>
         <div class="actions">
@@ -57,7 +63,6 @@
                     <checkmark v-if="item === false || item === true" :value="item"></checkmark>
                     <span v-else>{{ item }}</span>
                 </div>
-
             </div>
             <div class="meta">
                 <div>
@@ -131,9 +136,9 @@ export default defineComponent({
             return 'https://' + this.data?.url;
         },
         detailUrl() {
-            return "/listing/" + this.data?.id ;
+            return "/listing/" + this.data?.id;
         },
-      
+
         description() {
             return this.data?.description ?? '-';
         },
@@ -162,6 +167,9 @@ export default defineComponent({
         },
         address() {
             return this.data?.address ?? this.data?.locality?.name ?? "";
+        },
+        deleted() {
+            return this.data?.deleted;
         },
     },
     methods: {
@@ -199,8 +207,8 @@ export default defineComponent({
         border: brown solid 1px;
 
         &:hover {
-        background: brown;
-        color: white;
+            background: brown;
+            color: white;
         }
     }
 }
@@ -222,16 +230,29 @@ export default defineComponent({
     background-color: #f2f2f2;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 }
-
-
 
 .heading {
     color: brown;
     font-size: 1.5em;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
 
+.label-deleted {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    background: brown;
+    color: white;
 }
+}
+
+
 
 .images {
     display: flex;

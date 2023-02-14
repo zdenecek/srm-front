@@ -2,12 +2,12 @@
     <div>
         <listings-filter @update="update"></listings-filter>
         <div class="listings">
-            <div class="listings">
+            <div class="listings" :class="{ 'blur-deleted' : blurDeleted }">
                 <h1>{{ listingsCount }} inzerátů</h1>
 
                 <pagination
                             v-show="listingsCount > perPage"
-                            v-model="page"
+                     ;       v-model="page"
                             :records="listingsCount"
                             :per-page="perPage"
                             @paginate="updatePage"
@@ -30,7 +30,7 @@
 import { defineComponent } from "vue";
 import Listing from "@/components/Listing.vue";
 import axios from "axios";
-import _ from "lodash";
+import _, { filter } from "lodash";
 import ListingsFilter from "./ListingsFilter.vue";
 import { FilterObject } from "@/class/FilterObject";
 import { MunicipalityObject } from "@/class/MunicipalityObject";
@@ -53,6 +53,8 @@ export default defineComponent({
             loading: false,
             filter: undefined as FilterObject | undefined,
             municipalitiesFilter: [] as Array<MunicipalityObject>,
+                // has to be on data, because I cannot add another computed property (somewhat creates deep type errors (?))
+            blurDeleted: true,
         };
     },
 
@@ -62,9 +64,14 @@ export default defineComponent({
             this.loading = true;
             debounced();
         };
-
+        
+    },
+    mounted() {
+        // for compatibility with old links with id: /?id=123
         if (this.$route.query.id) this.getListings(this.$route.query.id as string);
         else this.getListings();
+
+        console.log(this.filter);
     },
 
     computed: {
@@ -73,12 +80,20 @@ export default defineComponent({
             if(this.listingsCount === 1) return true;
             return false;
         }
+        
     },
 
     watch: {
         page() {
             this.$router.push({ query: { p: this.page } });
-        }
+        },
+        filter: {
+            handler() {
+                if(this.filter?.deleted === "deleted") this.blurDeleted = false;
+                else this.blurDeleted = true;
+            },
+            deep: true,
+        },
     },
 
     methods: {
@@ -87,6 +102,7 @@ export default defineComponent({
             this.page = 1;
             this.municipalitiesFilter = municipalities || [];
             this.getListingsDebouced();
+            console.log("update")
         },
 
         getListings(id?: string) {
@@ -118,6 +134,7 @@ export default defineComponent({
                     this.listingsCount = response.data.count;
                     this.listings = response.data.listings;
                     this.loading = false;
+                    if(response.data.chain) console.debug(response.data.chain);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -140,6 +157,14 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+
+.blur-deleted .deleted:not(:hover) .top-labels,
+.blur-deleted .deleted:not(:hover) .images,
+.blur-deleted .deleted:not(:hover) .overview, 
+.blur-deleted .deleted:not(:hover) .actions {
+    opacity: 45%;
 }
 
 .pagination {

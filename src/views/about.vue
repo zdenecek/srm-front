@@ -68,6 +68,15 @@
         <h2>Historie verzí</h2>
         <ul>
             <li>
+                12.2.2023
+                <ul>
+                    <li>Web: Změna zobrazování labelů - slevy nad 30% se zobrazují všechny stejně, svícící prvky byly stejně většinou u nesmyslných slev</li>
+                    <li>Web/Api: Pokročilá možnost filtrování smazaných inzerátů - smazané, vše, aktivní</li>
+                    <li>Web: Zobrazení smazaných inzerátů - Label posunut před název, při zobrazení smazaných i nesmazaných inzerátů jsou smazané částečně průhledné, při najetí myší a/nebo rozkliknutí detailu se průhlednost obnoví</li>
+                    <li>Web: Oprava: při vytvoření filtru z url adresy - uloženého odkazu - je filtr aplikován rovnou při prvním spuštění, ne až při úpravě filtru, další detailní opravy</li>
+                </ul>
+            </li>
+            <li>
                 30.1.2023
                 <ul>
                     <li>Web: Detail inzerátu, Název stránky</li>
@@ -81,7 +90,7 @@
                 </ul>
             </li>
             <li>
-                14.11.2022
+                14.11.2022 
                 <ul>
                     <li>Web: Přidáno řazení</li>
                     <li>Web: Filtr je nyní perzistentní - při zachování url adresy zůstane filtr i při obnovení stránky.

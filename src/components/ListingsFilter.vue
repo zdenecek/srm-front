@@ -91,6 +91,15 @@
                                 <label :for="'o' + label">{{ label }}</label>
                             </div>
                         </div>
+                        <div class="label">Smazané inzeráty</div>
+                        <div>
+                            <input type="radio" id="deleted-active" v-model="filterObject.deleted" value="active" />
+                            <label for="deleted-active"> Aktivní</label>
+                            <input type="radio" id="deleted-all" v-model="filterObject.deleted" value="all" />
+                            <label for="deleted-all"> Vše</label>
+                            <input type="radio" id="deleted-deleted" v-model="filterObject.deleted" value="deleted" />
+                            <label for="deleted-deleted">Jen smazané</label>
+                        </div>
                         <div class="label">
                             <div class="flex">
                                 <span>Řazení</span>
@@ -132,13 +141,6 @@
                                         </div>
                                     </div>
                                 </template>
-                                <div class="label">Smazané inzeráty</div>
-                                <div>
-                                    <input type="checkbox" id="deleted" v-model="filterObject.deleted" />
-                                    <label for="deleted"> Zobrazit smazané</label>
-                                </div>
-
-
                             </div>
                         </Transition>
                     </div>
@@ -228,6 +230,9 @@ export default defineComponent({
     },
     mounted() {
         if (this.$route.query.id) this.collapseAll = true;
+        this.filterObject =  FilterObject.fromParams(this.$route.query);
+        if(this.filterObject.location) this.searchType = "loc";
+        this.update();
     },
     data() {
         return {
@@ -241,7 +246,7 @@ export default defineComponent({
                 price: { label: "Cena/Nájem", descLabel: "Sestupně", ascLabel: "Vzestupně" },
                 pricePerMeter: { label: "Cena/Nájem na plochu", descLabel: "Sestupně", ascLabel: "Vzestupně" },
             },
-            filterObject: FilterObject.fromParams(this.$route.query),
+            filterObject: new FilterObject(),
             searchType: "str" as "str" | "loc",
             subcategoryFormLabels: {
                 [Property.apartment]: "Typ bytu",

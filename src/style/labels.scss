@@ -55,30 +55,12 @@ background-color: darkkhaki;
 background-color: olive;
 }
 
-.top-label-price-drop {
-    box-shadow: 0 0 5px 1px brown;
 
-}
-
-.top-label-deleted {
-    background-color: red;
-    box-shadow: 0 0 5px 1px red;
-}
-
-.top-label-price-drop-50 {
-    background-color: red;
-    box-shadow: 0 0 10px 5px red;
-}
-.top-label-price-drop-40 {
-    background-color: red;
-    box-shadow: 0 0 10px 2px orangered;
-
-}
+.top-label-price-drop-50 , .top-label-price-drop-40,
 .top-label-price-drop-30 {
     background-color: red;
-    box-shadow: 0 0 10px 1px orange;
-
 }
+ 
 .top-label-price-drop-25 {
     background-color: lighten($color: darkred, $amount: 0);
 }

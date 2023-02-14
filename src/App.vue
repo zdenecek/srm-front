@@ -1,4 +1,5 @@
 <template>
+   
     <div class="container">
         <div class="nav">
             <router-link active-class="active" class="nav-item" to="/">Inzeráty</router-link>
@@ -13,6 +14,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
     name: "App",
+
 });
 </script>
 
@@ -70,24 +72,5 @@ input:focus {
     column-gap: 10px;
     margin: auto;
 }
-.paginate-buttons {
-    height: 40px;
-    width: 40px;
-    border-radius: 20px;
-    cursor: pointer;
-    background-color: rgb(242, 242, 242);
-    border: 1px solid rgb(217, 217, 217);
-    color: black;
-}
-.paginate-buttons:hover {
-    background-color: #d8d8d8;
-}
-.active-page {
-    background-color: #ca742d;
-    border: 1px solid #ca742d;
-    color: white;
-}
-.active-page:hover {
-    background-color: #ca742d;
-}
+
 </style>

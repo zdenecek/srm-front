@@ -5,7 +5,7 @@ export interface MunicipalityObject {
     selected: boolean;
 }
 
-export function compare(a: MunicipalityObject, b: MunicipalityObject) {
+export function compare(a: MunicipalityObject, b: MunicipalityObject) : number {
     if (a.count < b.count) {
         return 1;
     }
