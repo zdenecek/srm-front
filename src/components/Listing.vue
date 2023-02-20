@@ -38,9 +38,26 @@
                 <span>Vlastnictví</span>
                 <span>{{ ownership }}</span>
             </div>
-            <div class="listing-label" v-if="age">
+            <div class="listing-label">
                 <span>Stáří</span>
-                <span>{{ age }}</span>
+                <span>{{ ageString }}</span>
+            </div>
+            <div class="listing-label">
+                <span>Data</span>
+                <div class="dates">
+                    <div>
+                        <span>Vloženo</span>
+                        <span>{{dateStr(data?.inserted) }}</span>
+                    </div>
+                    <div v-if="data?.lastUpdate">
+                        <span>Naposledy aktualizováno</span>
+                        <span>{{ dateStr(data?.lastUpdate) }}</span>
+                    </div>
+                    <div v-if="deleted">
+                        <span>Smazáno</span>
+                        <span>{{ dateStr(data?.deleted) }}</span>
+                    </div>
+                </div>
             </div>
             <div class="listing-label" v-if="priceDrop">
                 <span>Sleva</span>
@@ -138,7 +155,19 @@ export default defineComponent({
         detailUrl() {
             return "/listing/" + this.data?.id;
         },
+        ageString() {
+            const to = this.data?.deleted ? Date.parse(this.data?.deleted) : Date.now();
+            const from = Date.parse(this.data?.inserted);
+            const age = Math.ceil((to - from) / (1000 * 60 * 60 * 24));
+            let s = age + (age === 1 ? " den" : " dní");
 
+            if(this.data?.deleted) {
+                const to2 = Date.now();
+                const age2 = Math.ceil((to2 - from) / (1000 * 60 * 60 * 24));
+                s += ` (${age2} ${age2 === 1 ? " den" : " dní"} od vložení)`;
+            }
+            return s;
+        },
         description() {
             return this.data?.description ?? '-';
         },
@@ -151,13 +180,6 @@ export default defineComponent({
         },
         priceHistory() {
             return this.data?.priceHistory;
-        },
-        age() {
-            if (this.data?.inserted) {
-                const age = Math.ceil((Date.now() - Date.parse(this.data?.inserted)) / (1000 * 60 * 60 * 24));
-                return age + (age === 1 ? " den" : " dní");
-            }
-            else return false;
         },
         ownership() {
             return Ownership[this.data?.ownership] ?? false;
@@ -175,7 +197,10 @@ export default defineComponent({
     methods: {
         toggleDetails() {
             this.showDetails = !this.showDetails;
-        }
+        },
+        dateStr(date: string) : string {
+            return  new Date(Date.parse(date)).toLocaleDateString();
+        }   
     }
 });
 </script>
@@ -270,6 +295,20 @@ export default defineComponent({
     gap: 6px;
 }
 
+.dates {
+    display: flex;
+    flex-flow: row;
+    gap: 15px;
+    align-items: center;
+
+    & > div {
+        display: flex;
+        flex-flow: row;
+        gap: 6px;
+        align-items: center;
+    }
+}
+
 .actions {
     display: flex;
     flex-flow: row;
@@ -312,7 +351,7 @@ export default defineComponent({
     grid-template-columns: 100px auto;
     gap: 10px;
 
-    span:first-child {
+    & > span:first-child {
         width: 100%;
         font-weight: bold;
         text-align: right;

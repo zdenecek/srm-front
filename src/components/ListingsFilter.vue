@@ -93,7 +93,7 @@
                         </div>
                         <div class="label">Smazané inzeráty</div>
                         <div>
-                            <input type="radio" id="deleted-active" v-model="filterObject.deleted" value="active" />
+                            <input type="radio" id="deleted-active" v-model="filterObject.deleted" value="active"  />
                             <label for="deleted-active"> Aktivní</label>
                             <input type="radio" id="deleted-all" v-model="filterObject.deleted" value="all" />
                             <label for="deleted-all"> Vše</label>
@@ -189,6 +189,7 @@ export default defineComponent({
     watch: {
         filterObject: {
             handler() {
+                if(!this.filterObject.deleted) this.filterObject.deleted = "active";
                 this.update();
             },
             deep: true,

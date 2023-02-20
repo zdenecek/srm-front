@@ -62,13 +62,15 @@ export class FilterObject {
             "priceDropCzk",
             "ageMin",
             "ageMax",
-            "deleted",
         ];
 
         for (const key of keys) {
             // @ts-ignore
             if (this[key]) obj[key] = this[key];
         }
+
+        // @ts-ignore
+        if(this["deleted"] && this["deleted"] !== "active") obj["deleted"] = this["deleted"];
 
         keys = ["deal", "property", "subcategory", "ownership"];
 
@@ -120,13 +122,15 @@ export class FilterObject {
             "priceDropCzk",
             "ageMin",
             "ageMax",
-            "deleted",
+            
         ];
 
         for (const key of keys) {
             // @ts-ignore
             if (params[key]) f[key] = params[key];
         }
+        // @ts-ignore
+        if(params["deleted"] && params["deleted"] !== "active") f["deleted"] = params["deleted"];
 
         keys = ["deal", "property", "subcategory", "ownership"];
 

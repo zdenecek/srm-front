@@ -2,9 +2,17 @@
     <canvas class="price-chart" ref="canvas"></canvas>
 </template>
 
+<style lang="scss">
+.price-chart {
+    width: 100%;
+    height: 200px;
+}
+</style>
+
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Chart, ChartItem } from "chart.js";
+import PriceHistoryHelper from "@/class/PriceHistory";
 
 export interface PriceChartData {
     priceHistory: { [key: string]: number };
@@ -18,24 +26,8 @@ export default defineComponent({
     },
     mounted() {
 
-
-
-        // add price for today to have at least two entries
-        const data = { ...this.data?.priceHistory }
-        // sort just in case
-        const ordered = Object.keys(data).sort().reduce(
-        (obj, key) => { 
-            obj[key] = data[key]; 
-            return obj;
-        }, 
-        {} as Record<string, number>
-        );
-
-
-        const lastDate = this.data?.deleted ?? new Date(Date.now()).toISOString().split('T')[0];
-        const values = Object.values(ordered);
-        ordered[lastDate] = values[values.length - 1];
-
+        if(!this.data?.priceHistory) return;
+        const normalizedData = PriceHistoryHelper.normalize(this.data.priceHistory, this.data?.deleted);
 
         new Chart(this.$refs.canvas as ChartItem, {
             type: "line",
@@ -45,7 +37,7 @@ export default defineComponent({
                         label: "Cena",
                         fill: true,
                         borderColor: 'brown',
-                        data: ordered,
+                        data: normalizedData,
                     },
                 ],
             },
@@ -60,9 +52,3 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-.price-chart {
-    width: 100%;
-    height: 200px;
-}
-</style>

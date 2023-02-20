@@ -1,10 +1,11 @@
-export const DealCodes = [1, 2, 3];
-export const DealLabels: Record<DealType, string> = { 1: "Prodej", 2: "Pronájem", 3: "Dražba" };
+export const DealCodes = [1, 2, 3, 4];
+export const DealLabels: Record<DealType, string> = { 1: "Prodej", 2: "Pronájem", 3: "Dražba", 4: "Podíly" };
 export type DealType = typeof DealCodes[number];
 export enum Deal {
     "sell" = 1,
     "rent" = 2,
     "auction" = 3,
+    "shares" = 4,
 }
 
 export const PropertyCodes = [1, 2, 3, 4, 5];
