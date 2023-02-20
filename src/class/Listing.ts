@@ -20,9 +20,9 @@ export default interface Listing {
     coordinates: [number, number]
   };
   images:  Array<{self: URL, gallery: URL, view: URL}>;
-  items: any;
+  items: Record<string, string | number | boolean>;
   // items: {
-  //   Celková cena: 4 800 000;
+  //   Celková cena: 4800000;
   //   ID zakázky: B50077083;
   //   Aktualizace: 06.01.2023;
   //   Stavba: Panelová;

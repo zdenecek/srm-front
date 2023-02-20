@@ -8,10 +8,11 @@
 </template>
 
 <script lang="ts">
-import {  defineComponent } from "vue";
+import { defineComponent } from "vue";
 import Listing from "@/components/Listing.vue";
 import axios from "axios";
 import { useHead } from '@unhead/vue';
+import ListingClass from "@/class/Listing";
 
 export default defineComponent({
     name: "ListingsDetail",
@@ -23,39 +24,34 @@ export default defineComponent({
     data() {
         return {
             loading: true,
-            listing: null as any
+            listing: null as ListingClass | null
         };
     },
-
     created() {
-
         this.getListing(this.$route.params.id as string);
     },
-
     methods: {
-
         getListing(id?: string) {
             console.debug("fetching listing");
             this.loading = true;
-
-
             axios
                 .get(`listing/${id}`)
                 .then((response) => {
-
-                    console.log(response.data);
                     this.listing = response.data;
                     this.loading = false;
-                    useHead({  title: this.listing.title + ' | Sreality Manager'});
+                    if(!this.listing) {
+                        console.error("Listing not found");
+                        return;
+                    }
+                    useHead({ title: this.listing.title + ' | Sreality Manager' });
                 })
                 .catch((error) => {
                     console.error(error);
+                    this.loading = false;
                 });
         },
     },
 });
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

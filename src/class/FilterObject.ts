@@ -1,3 +1,4 @@
+import { LocationQuery } from "vue-router";
 import { GeoObject } from "./GeoObject";
 import { DealType, OwnershipType, PropertyType } from "./types";
 
@@ -45,8 +46,8 @@ export class FilterObject {
     location?: GeoObject;
     orderBy = new Array<Ordering>();
 
-    toParams(): Record<string, unknown> {
-        const obj = {} as any;
+    toParams(): LocationQuery {
+        const obj = {} as LocationQuery;
 
         let keys = [
             "query",
@@ -87,18 +88,18 @@ export class FilterObject {
         /** todo sub */
 
         if (this.location) {
-            obj.lat = this.location.userData.latitude;
-            obj.lon = this.location.userData.longitude;
-            obj.radius = this.location.radius;
+            obj.lat = this.location.userData.latitude.toString();
+            obj.lon = this.location.userData.longitude.toString();
+            obj.radius = this.location.radius.toString();
         }
 
         if (this.orderBy.length > 0) {
             const o = new Set();
-            obj.orderBy = [];
+            const orderBy = [] as string[];
             this.orderBy.forEach((e, i) => {
                 if (o.has(e.key)) return;
                 o.add(e.key);
-                obj.orderBy.push(`${i}:${e.key}:${e.desc ? "desc" : "asc"}`);
+                orderBy.push(`${i}:${e.key}:${e.desc ? "desc" : "asc"}`);
             });
         }
 
@@ -122,20 +123,17 @@ export class FilterObject {
             "priceDropCzk",
             "ageMin",
             "ageMax",
-            
         ];
 
         for (const key of keys) {
             // @ts-ignore
             if (params[key]) f[key] = params[key];
         }
-        // @ts-ignore
-        if(params["deleted"] && params["deleted"] !== "active") f["deleted"] = params["deleted"];
+        if(params["deleted"] && params.deleted !== "active") f["deleted"] = params.deleted as DeletedOption;
 
         keys = ["deal", "property", "subcategory", "ownership"];
 
         for (const key of keys) {
-            // @ts-ignore
             if (key in params) {
                 // @ts-ignore
                 for (const s of params[key].split(",")) {
@@ -157,7 +155,6 @@ export class FilterObject {
             };
         }
 
-        // @ts-ignore
         if ("orderBy" in params) {
             f.orderBy = [];
 

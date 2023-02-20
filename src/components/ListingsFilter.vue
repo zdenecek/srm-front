@@ -176,6 +176,7 @@ import { MunicipalityObject } from "@/class/MunicipalityObject";
 import CollapseButton from "./partial/CollapseButton.vue";
 import { DealLabels, PropertyLabels, OwnershipLabels, SubcategoryLabels, Property, PropertyCodes, PropertyType } from "@/class/types";
 import 'tippy.js/dist/tippy.css';
+import { LocationQuery } from "vue-router";
 // import Tooltip from "./Tooltip.vue";
 
 export default defineComponent({
@@ -206,7 +207,7 @@ export default defineComponent({
         update() {
             this.$emit("update", this.filterObject, this.municipalities);
 
-            this.$router.push({ query: this.filterObject.toParams() as any });
+            this.$router.push({ query: this.filterObject.toParams() as LocationQuery });
         },
         updateMunicipalities(municipalities: Array<MunicipalityObject>) {
             this.municipalities = municipalities;

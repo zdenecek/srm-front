@@ -30,12 +30,14 @@
 import { defineComponent } from "vue";
 import Listing from "@/components/Listing.vue";
 import axios from "axios";
-import _, { filter } from "lodash";
+import _ from "lodash";
 import ListingsFilter from "./ListingsFilter.vue";
 import { FilterObject } from "@/class/FilterObject";
 import { MunicipalityObject } from "@/class/MunicipalityObject";
 // @ts-ignore
 import Pagination from "v-pagination-3";
+import ListingObject from "@/class/Listing";
+import { LocationQuery } from "vue-router";
 
 export default defineComponent({
     name: "ListingsView",
@@ -46,7 +48,7 @@ export default defineComponent({
     },
     data() {
         return {
-            listings: [] as Array<any>,
+            listings: [] as Array<ListingObject>,
             listingsCount: 0,
             perPage: parseInt(this.$route.query.perPage as string) || 20,
             page: parseInt(this.$route.query.p as string) || 1,
@@ -111,7 +113,7 @@ export default defineComponent({
             let params = {
                 p: this.page,
                 perPage: this.perPage,
-            } as any;
+            } as unknown as LocationQuery;
 
             if (this.filter) {
                 params = { ...params, ...this.filter.toParams() };
