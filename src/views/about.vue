@@ -68,6 +68,21 @@
         <h2>Historie verzí</h2>
         <ul>
             <li>
+                23.2.2023
+                <ul>
+                    <li>Web: Oprava řazení</li>
+                </ul>
+            </li>
+
+            <li>
+                20.2.2023
+                <ul>
+                    <li>Web: Zobrazování důležitých dat (datumů), změna zobrazování stáří smazaných inzerátů, přidány podíly, oprava nezakliknutí defaultní možnosti u volby zobrazení smazaných inzerátů</li>
+                    <li>Scraper: Scraper sbírá podíly, sbíral je ale i do teď, protože se zobrazovaly v api i v jiných kategoriích</li>
+                    <li>Databáze: Smazány ceny z 20. 9. 2022, které se po jednom dni změnily</li>
+                </ul>
+            </li>
+            <li>
                 12.2.2023
                 <ul>
                     <li>Web: Změna zobrazování labelů - slevy nad 30% se zobrazují všechny stejně, svícící prvky byly stejně většinou u nesmyslných slev</li>

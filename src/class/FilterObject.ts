@@ -101,6 +101,7 @@ export class FilterObject {
                 o.add(e.key);
                 orderBy.push(`${i}:${e.key}:${e.desc ? "desc" : "asc"}`);
             });
+            obj.orderBy = orderBy;
         }
 
         return obj;

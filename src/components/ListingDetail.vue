@@ -32,7 +32,7 @@ export default defineComponent({
     },
     methods: {
         getListing(id?: string) {
-            console.debug("fetching listing");
+            //console.debug("fetching listing");
             this.loading = true;
             axios
                 .get(`listing/${id}`)

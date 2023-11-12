@@ -72,8 +72,6 @@ export default defineComponent({
         // for compatibility with old links with id: /?id=123
         if (this.$route.query.id) this.getListings(this.$route.query.id as string);
         else this.getListings();
-
-        console.log(this.filter);
     },
 
     computed: {
@@ -93,6 +91,7 @@ export default defineComponent({
             handler() {
                 if(this.filter?.deleted === "deleted") this.blurDeleted = false;
                 else this.blurDeleted = true;
+                console.log(this.filter);
             },
             deep: true,
         },
@@ -101,10 +100,10 @@ export default defineComponent({
     methods: {
         update(filter?: FilterObject, municipalities?: Array<MunicipalityObject>) {
             this.filter = filter;
+
             this.page = 1;
             this.municipalitiesFilter = municipalities || [];
             this.getListingsDebouced();
-            console.log("update")
         },
 
         getListings(id?: string) {
